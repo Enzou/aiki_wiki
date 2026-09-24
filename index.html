@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" id="themeColor" content="#1E2740">
 <title>Aiki wiki — programa de exámenes y glosario de Aikido</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +42,7 @@
 }
 :root[data-theme="dark"]{color-scheme:dark}
 *,*::before,*::after{box-sizing:inherit}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;height:100%;background:var(--bg);color:var(--text);font:400 15.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
 button,input,select{font:inherit;color:inherit}
 a{color:var(--igusa-strong)}
@@ -84,6 +85,7 @@ a{color:var(--igusa-strong)}
 .beltlink:focus-visible{outline:2px solid var(--focus)}
 .beltlink i{width:26px;height:8px;border-radius:3px;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
 .beltlink .pc{margin-left:auto;font-size:12px;font-variant-numeric:tabular-nums}
+.mtheme{display:none}
 .side .foot{margin-top:auto;display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid var(--line)}
 .tog{all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);padding:5px 8px;border-radius:7px}
 .tog:hover{color:var(--text)}
@@ -268,6 +270,7 @@ details.hw summary{cursor:pointer;font-weight:500}
 
 /* dock de video */
 .dock{display:flex;flex-direction:column;padding:18px;overflow:auto}
+.dock>*{flex:none}
 .dock h2{font-size:15px;font-family:var(--sans);font-weight:500;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .screen{aspect-ratio:16/9;border-radius:10px;background:#0c0f1a;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden;position:relative}
 .screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
@@ -287,6 +290,7 @@ details.hw summary{cursor:pointer;font-weight:500}
 .x{all:unset;cursor:pointer;font-size:20px;line-height:1;padding:2px 6px;border-radius:6px}
 .x:focus-visible{outline:2px solid var(--focus)}
 .kbdhint{font-size:12px;color:var(--muted);margin-top:10px}
+@media (hover:none){.kbdhint{display:none}}
 
 /* responsivo */
 @media (max-width:1320px){
@@ -296,30 +300,69 @@ details.hw summary{cursor:pointer;font-weight:500}
   .cols{grid-template-columns:1fr 1fr}
 }
 @media (max-width:900px){
-  body{overflow:auto}
-  .app{display:block;height:auto;padding:10px}
-  .side{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;flex-direction:row;flex-wrap:wrap;align-items:center;padding:10px;margin-bottom:10px;gap:6px}
-  .brand{border:0;margin:0;padding:0 8px 0 4px}
+  body{overflow:auto;height:auto;min-height:100%}
+  body.lock{overflow:hidden}
+  .app{display:block;height:auto;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+  .side{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;display:grid;grid-template-columns:1fr auto;align-items:center;padding:8px 8px 6px;margin-bottom:8px;gap:4px;overflow:visible;
+    background:var(--panel-solid);backdrop-filter:none;-webkit-backdrop-filter:none}
+  .brand{border:0;margin:0;padding:0 4px}
+  .brand .mark{font-size:26px}
+  .brand .name{font-size:17px}
   .brand small{display:none}
-  .nav{flex-direction:row;flex-wrap:wrap}
+  .mtheme{all:unset;display:grid;place-items:center;width:40px;height:40px;border-radius:10px;font-size:20px;color:var(--igusa-strong);cursor:pointer}
+  .mtheme:focus-visible{outline:2px solid var(--focus)}
+  .nav{grid-column:1/-1;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:4px;margin:0 -8px;padding:2px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .nav::-webkit-scrollbar{display:none}
+  .nav button{flex:none;padding:8px 12px;font-size:14.5px;white-space:nowrap}
   .nav button .k{display:none}
   .side .belts,.side .foot{display:none}
   .main{overflow:visible}
-  .view{padding:20px 16px 40px}
-  .hero{grid-template-columns:1fr}
-  .hero .kanji{writing-mode:horizontal-tb;font-size:72px}
-  .hero h1{font-size:38px}
+  .view{padding:18px 14px 36px}
+  h1{font-size:30px}
+  h2{font-size:22px}
+  .hero{grid-template-columns:1fr;gap:10px}
+  .hero .kanji{writing-mode:horizontal-tb;font-size:64px}
+  .hero h1{font-size:34px}
+  .main.window .hero{min-height:0}
   .ladder{grid-template-columns:repeat(3,1fr)}
   .cols,.howto{grid-template-columns:1fr}
   .tech{grid-template-columns:1fr}
   .row{grid-template-columns:24px 1fr}
   .row .vids{grid-column:2}
+  .vb{padding:8px 12px 8px 9px}
   .prog{grid-template-columns:1fr 1fr}
-  .dock{left:10px;right:10px;width:auto}
   .dan{grid-template-columns:1fr}
+  .gl{grid-template-columns:1fr}
+  .quiz{padding:18px}
+  .quiz .q{font-size:24px}
   .tools{position:static;background:none}
-  .tools .search{flex-basis:100%}
+  .seg{max-width:100%;overflow-x:auto;scrollbar-width:none}
+  .seg button{flex:none;padding:9px 13px}
+  #mapSeg{width:auto!important}
+  .tools .search,.gtools .search{flex-basis:100%;max-width:none!important}
+  .search input{font-size:16px} /* evita el zoom automático de Safari al escribir */
   .search kbd{display:none}
+  .ghead .gkan{font-size:48px}
+}
+@media (max-width:900px),(pointer:coarse) and (max-height:500px){
+  /* video en pantalla completa */
+  .dock{position:fixed;inset:0;width:auto;max-height:none;z-index:30;border-radius:0;border:0;padding:0 0 env(safe-area-inset-bottom,0px);
+    background:var(--panel-solid);backdrop-filter:none;-webkit-backdrop-filter:none;overscroll-behavior:contain}
+  .dock h2{position:sticky;top:0;z-index:2;margin:0;padding:calc(6px + env(safe-area-inset-top,0px)) 8px 6px 16px;background:var(--panel-solid)}
+  .dock .x{width:44px;height:44px;display:grid;place-items:center;font-size:28px}
+  .screen{position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:2;border-radius:0;border-width:1px 0;background:#000}
+  .vt,.dock .btns,.queue{margin-left:16px;margin-right:16px}
+  .dock .btns .btn{padding:11px 16px}
+  .dock .btns .btn[aria-label]{min-width:24px;text-align:center;font-size:17px}
+  .queue ol{max-height:none}
+  .queue li button{display:block;padding:7px 0}
+}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:500px){
+  /* celular acostado: el video ocupa todo el alto */
+  .dock{padding:0 env(safe-area-inset-right,0px) 0 env(safe-area-inset-left,0px)}
+  .dock h2{position:absolute;right:env(safe-area-inset-right,0px);top:0;z-index:3;padding:4px;background:none}
+  .dock h2>span{display:none}
+  .screen{position:static;height:100vh;height:100dvh;aspect-ratio:auto;border:0}
 }
 @media (prefers-reduced-motion: reduce){.grain{animation:none}.main{scroll-behavior:auto}}
 </style>
@@ -337,6 +380,7 @@ details.hw summary{cursor:pointer;font-weight:500}
       <span class="mark" aria-hidden="true">合気</span>
       <span><span class="name">Aiki wiki</span><small>Programa de exámenes y glosario</small></span>
     </a>
+    <button class="mtheme" id="mThemeBtn" aria-label="Cambiar tema claro u oscuro">◐</button>
     <nav class="nav" id="nav">
       <button data-go="inicio"><span class="k" aria-hidden="true">道</span>Inicio</button>
       <button data-go="programa"><span class="k" aria-hidden="true">級</span>Programa por grado</button>
@@ -838,7 +882,7 @@ function go(v,opts={}){
   if(v==='programa')renderGrade();
   if(v==='practica')renderPractice();
   $('#main').classList.toggle('window',v==='inicio');updatePct();
-  if(!opts.keepScroll)$('#main').scrollTop=0;
+  if(!opts.keepScroll){$('#main').scrollTop=0;if(isMobile())scrollTo(0,0)}
   history.replaceState(null,'','#'+v+(v==='programa'?'-'+gradeId:''));
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){e.preventDefault();go(b.dataset.go)}});
@@ -902,6 +946,7 @@ $('#gradeBody').addEventListener('change',e=>{const c=e.target.closest('[data-do
 $('#playAll').onclick=()=>{const f=FLAT.find(x=>x.g.id===gradeId&&(modFilter==='all'||x.s.m===modFilter));if(f)openVideo(f.key,0)};
 
 /* ============ DOCK DE VIDEO ============ */
+const isMobile=()=>matchMedia('(max-width:900px),(pointer:coarse) and (max-height:500px)').matches;
 /* Dentro de claude.ai la política de seguridad bloquea los reproductores externos: ahí se usa el enlace.
    En cualquier otro alojamiento (GitHub Pages, Google Sites, Netlify) el video se reproduce dentro de la página. */
 const HOSTED_IN_CLAUDE=/claude/i.test(location.hostname);
@@ -913,11 +958,11 @@ function openVideo(key,vi){
 }
 function openRef(id,t){refMode={id,t};showDock()}
 function showDock(){
-  const app=$('#app');app.classList.remove('nodock');app.classList.add('showdock');
+  const app=$('#app');app.classList.remove('nodock');app.classList.add('showdock');document.body.classList.toggle('lock',isMobile());
   let id,l1,l2,l3;
   if(refMode){id=refMode.id;l1='Video de referencia de la técnica';l2=refMode.t;l3='Muestra la forma general, sin un ataque específico.'}
   else{const q=queue[qpos];id=q.id;l1=`${q.f.g.kyu}, ${MODS[q.f.s.m].n}`;l2=`${q.f.r.a} ${q.f.it.t}`;l3=q.l==='Video'?'Única variante del programa':'Variante: '+q.l;seen[id]=1;store.set('seen',seen)}
-  $('#screen').innerHTML=embed?`<iframe src="https://www.youtube-nocookie.com/embed/${id}?rel=0" title="${esc(l2)}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>`
+  $('#screen').innerHTML=embed?`<iframe src="https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1&modestbranding=1" title="${esc(l2)}" allow="autoplay; accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>`
     :`<div class="ph"><span class="big" aria-hidden="true">${refMode?'型':(GL[gFind(queue[qpos].f.it.t)]?.k||'技')}</span><span>El video se abre en YouTube, en una pestaña nueva.</span></div>`;
   $('#vt').innerHTML=`<div class="l1">${esc(l1)}</div><div class="l2">${esc(l2)}</div><div class="l3">${esc(l3)}</div>`;
   $('#vbtns').innerHTML=`<a class="btn pri" href="${yt(id)}" target="_blank" rel="noopener">Abrir en YouTube ↗</a>`+
@@ -927,12 +972,12 @@ function showDock(){
   if(!refMode){$('#prevV').onclick=()=>step(-1);$('#nextV').onclick=()=>step(1)}
   $('#queue').innerHTML=refMode?'':`<div>Repaso de ${queue[qpos].f.g.kyu}: ${qpos+1} de ${queue.length}</div><ol>${queue.map((q,i)=>`<li class="${i===qpos?'cur':''}"><button data-q="${i}">${esc(q.f.r.a)} ${esc(q.f.it.t)}${q.l!=='Video'?', '+esc(q.l.toLowerCase()):''}</button></li>`).join('')}</ol><p class="kbdhint">Atajos: ← → cambian de variante, Esc cierra.</p>`;
   $$('#queue [data-q]').forEach(b=>b.onclick=()=>{qpos=+b.dataset.q;showDock()});
-  const cur=$('#queue li.cur');cur&&cur.scrollIntoView({block:'nearest'});
+  if(isMobile())$('#dock').scrollTop=0;else{const cur=$('#queue li.cur');cur&&cur.scrollIntoView({block:'nearest'})}
   markCurrent();
 }
 function step(d){if(refMode)return;const n=qpos+d;if(n<0||n>=queue.length)return;qpos=n;showDock()}
 function markCurrent(){$$('.vb').forEach(b=>{const q=queue[qpos];const on=!refMode&&q&&b.dataset.key===q.f.key&&+b.dataset.vi===q.vi;b.classList.toggle('cur',on);if(seen[b.dataset.id])b.classList.add('seen')})}
-function closeDock(){$('#app').classList.add('nodock');$('#app').classList.remove('showdock');$('#screen').innerHTML='';qpos=-1;refMode=null;markCurrent()}
+function closeDock(){document.body.classList.remove('lock');$('#app').classList.add('nodock');$('#app').classList.remove('showdock');$('#screen').innerHTML='';qpos=-1;refMode=null;markCurrent()}
 $('#closeDock').onclick=closeDock;
 document.addEventListener('keydown',e=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
@@ -1107,9 +1152,11 @@ $('#resetBtn').onclick=()=>{if(confirm('¿Borrar las marcas de práctica y los v
 
 /* ============ TEMA ============ */
 const root=document.documentElement;
-function applyTheme(t){if(t)root.setAttribute('data-theme',t);else root.removeAttribute('data-theme')}
+function applyTheme(t){if(t)root.setAttribute('data-theme',t);else root.removeAttribute('data-theme');syncThemeColor()}
+function syncThemeColor(){const light=root.getAttribute('data-theme')?root.getAttribute('data-theme')==='light':matchMedia('(prefers-color-scheme: light)').matches;$('#themeColor').content=light?'#DCD8C4':'#1E2740'}
+matchMedia('(prefers-color-scheme: light)').addEventListener?.('change',syncThemeColor);
 applyTheme(store.get('theme',null));
-$('#themeBtn').onclick=()=>{const cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');const n=cur==='light'?'dark':'light';applyTheme(n);store.set('theme',n)};
+$('#themeBtn').onclick=$('#mThemeBtn').onclick=()=>{const cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');const n=cur==='light'?'dark':'light';applyTheme(n);store.set('theme',n)};
 
 /* =============================================================
    FONDO: tatami visto desde arriba con dos practicantes que
