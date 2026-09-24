@@ -222,6 +222,27 @@ details.hw summary{cursor:pointer;font-weight:500}
 #pop button{all:unset;cursor:pointer;font-size:13px;color:var(--igusa-strong);text-decoration:underline}
 
 /* danes */
+.dsec{margin-top:30px}
+.dsec>h2{margin-bottom:4px}
+.dsec>.desc{font-size:14px;color:var(--muted);margin-bottom:12px}
+.box{border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:rgba(255,255,255,.025);max-width:820px}
+.box ul,.dodont ul{margin:0;padding-left:18px;font-size:14.5px;display:flex;flex-direction:column;gap:7px}
+.steps{list-style:none;counter-reset:st;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;max-width:760px}
+.steps li{counter-increment:st;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;font-size:14.5px}
+.steps li::before{content:counter(st);font:700 18px/1.4 var(--serif);color:var(--igusa-strong);text-align:right}
+.steps li small{display:block;color:var(--muted);font-size:13px}
+.phr{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.phr>div{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.025)}
+.phr b{font:700 17px var(--serif);display:block}
+.phr .kj{font:500 17px var(--serif);color:var(--igusa-strong);display:block}
+.phr .pr{display:block;font-size:13px;color:var(--muted)}
+.phr p{font-size:14px;margin:6px 0 0}
+.dodont{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dodont>div{border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:rgba(255,255,255,.025)}
+.dodont h3{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.dodont h3 .mk{font:800 22px var(--serif);color:var(--igusa-strong)}
+.dodont li small{display:block;color:var(--muted);font-size:13px}
+@media (max-width:900px){.dodont{grid-template-columns:1fr}}
 .dans{display:flex;flex-direction:column;gap:12px;margin-top:18px}
 .dan{display:grid;grid-template-columns:120px 1fr;gap:18px;border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:rgba(255,255,255,.025)}
 .dan .dk{font:800 34px/1 var(--serif);color:var(--igusa-strong)}
@@ -322,6 +343,7 @@ details.hw summary{cursor:pointer;font-weight:500}
       <button data-go="tecnicas"><span class="k" aria-hidden="true">技</span>Mapa de técnicas</button>
       <button data-go="glosario"><span class="k" aria-hidden="true">語</span>Glosario</button>
       <button data-go="danes"><span class="k" aria-hidden="true">段</span>Danes</button>
+      <button data-go="dojo"><span class="k" aria-hidden="true">礼</span>Dojo</button>
       <button data-go="practica"><span class="k" aria-hidden="true">稽</span>Mi práctica</button>
     </nav>
     <div class="belts" id="sideBelts" aria-label="Ir a un grado"></div>
@@ -384,7 +406,7 @@ details.hw summary{cursor:pointer;font-weight:500}
         <summary>Cómo leer este glosario</summary>
         <div class="howto">
           <p><b>Grafía.</b> Usamos la forma del programa como entrada principal y mostramos la romanización Hepburn con vocales largas (ō, ū). Si el programa usa otra grafía (Nikkyo, Jiju waza, Zagi) aparece como variante.</p>
-          <p><b>Pronunciación.</b> Es aproximada. La «j» suena como la «y» rioplatense (jiyū → «yiyú»), la «g» es siempre suave como en «gato» (nage → «naguê»), la «u» final casi no suena (tsuki → «tski») y «sh» es como en inglés.</p>
+          <p><b>Pronunciación.</b> Es aproximada. La tilde no marca un golpe de voz sino una vocal larga, que se sostiene el doble (dōjō → «doyó»): el japonés casi no acentúa sílabas. La «j» suena como la «y» rioplatense (jiyū → «yiyú»), la «g» es siempre suave como en «gato» (nage se lee «nague»), la «u» final casi no suena (tsuki → «tski») y «sh» es como en inglés.</p>
           <p><b>Composición.</b> Muchos nombres se arman por piezas: ataque + técnica + variante. «Shomen uchi ikkyo omote» se lee: golpe frontal, primera enseñanza, hacia el frente.</p>
           <p><b>Dónde aparece.</b> Las etiquetas de color se calculan del programa: indican en qué grados aparece cada ataque o técnica y te llevan ahí.</p>
           <p><b>Grados y técnicas.</b> Ojo con los homónimos: Ikkyō (一教, primera técnica) no es Ikkyū (一級, 1.er kyu). Cambia solo la última vocal.</p>
@@ -404,6 +426,14 @@ details.hw summary{cursor:pointer;font-weight:500}
       <h1 id="h-dan">Danes</h1>
       <p class="lead" style="margin-top:8px">Después del 1.º kyu, el programa ya no pide una lista cerrada: pide dominar todo lo anterior en cualquier posición y ante cualquier ataque, y suma armas y varios atacantes.</p>
       <div class="dans" id="dans"></div>
+    </section>
+
+    <!-- DOJO -->
+    <section class="view" id="v-dojo" aria-labelledby="h-dojo">
+      <h1 id="h-dojo">Dojo</h1>
+      <p class="lead" style="margin-top:8px">El dojo es el lugar donde se recorre el camino. La etiqueta (reigi) no es un adorno: cuida los cuerpos, ordena la clase y hace posible practicar técnicas que, sin cuidado, lastimarían. Estas son las pautas más extendidas.</p>
+      <p class="note" style="margin-top:14px">Cada dojo tiene sus propias costumbres. Ante la duda, observa a quienes practican hace más tiempo y pregunta a tu sensei: su indicación manda sobre esta guía.</p>
+      <div id="dojoBody"></div>
     </section>
 
     <!-- PRACTICA -->
@@ -627,19 +657,19 @@ const CATS={ata:'Ataques',tec:'Técnicas',pos:'Posiciones y modalidades',mov:'Mo
 const GL=[
 // ataques
 {t:'Katate dori',h:'Katate-dori',k:'片手取り',p:'katate dori',l:'agarrar una mano',d:'Uke toma con una mano una muñeca de tori. Sin otra aclaración suele entenderse en gyaku hanmi (guardias opuestas): mano izquierda de uke a la derecha de tori, o viceversa.',c:'ata'},
-{t:'Ai hanmi katate dori',h:'Ai-hanmi katate-dori',k:'相半身片手取り',p:'ái janmi katate dori',l:'agarre de una mano en guardia igual',d:'Con ambos en la misma guardia, uke toma con su mano derecha la muñeca derecha de tori (o izquierda con izquierda), así que el agarre queda cruzado. Es el agarre con el que empieza el programa de 5.º kyu.',c:'ata'},
-{t:'Ryote dori',h:'Ryōte-dori',k:'両手取り',p:'riote dori',l:'agarrar ambas manos',d:'Uke toma las dos muñecas de tori, una con cada mano.',c:'ata'},
-{t:'Katate ryote dori',h:'Katate ryōte-dori',k:'片手両手取り',p:'katate riote dori',l:'una mano tomada con las dos',d:'Uke toma un antebrazo de tori con ambas manos. También se lo llama morote dori.',c:'ata',alt:['Morote dori']},
+{t:'Ai hanmi katate dori',h:'Ai-hanmi katate-dori',k:'相半身片手取り',p:'ai janmi katate dori',l:'agarre de una mano en guardia igual',d:'Con ambos en la misma guardia, uke toma con su mano derecha la muñeca derecha de tori (o izquierda con izquierda), así que el agarre queda cruzado. Es el agarre con el que empieza el programa de 5.º kyu.',c:'ata'},
+{t:'Ryote dori',h:'Ryōte-dori',k:'両手取り',p:'rióte dori',l:'agarrar ambas manos',d:'Uke toma las dos muñecas de tori, una con cada mano.',c:'ata'},
+{t:'Katate ryote dori',h:'Katate ryōte-dori',k:'片手両手取り',p:'katate rióte dori',l:'una mano tomada con las dos',d:'Uke toma un antebrazo de tori con ambas manos. También se lo llama morote dori.',c:'ata',alt:['Morote dori']},
 {t:'Kata dori',h:'Kata-dori',k:'肩取り',p:'kata dori',l:'agarrar el hombro',d:'Uke toma la manga o la tela del keikogi a la altura del hombro de tori.',c:'ata'},
 {t:'Kata dori men uchi',h:'Kata-dori men-uchi',k:'肩取り面打ち',p:'kata dori men uchi',l:'agarre de hombro y golpe a la cabeza',d:'Uke toma el hombro con una mano y enseguida golpea a la cabeza con la otra. Tori debe resolver dos ataques encadenados.',c:'ata'},
 {t:'Shomen uchi',h:'Shōmen-uchi',k:'正面打ち',p:'shómen uchi',l:'golpe al frente',d:'Golpe vertical descendente con el canto de la mano (tegatana) al centro de la frente, como un corte de espada de arriba hacia abajo.',c:'ata'},
-{t:'Yokomen uchi',h:'Yokomen-uchi',k:'横面打ち',p:'iokómen uchi',l:'golpe al costado de la cabeza',d:'Golpe diagonal con tegatana a la sien o al costado del cuello, como un corte de espada en diagonal.',c:'ata'},
+{t:'Yokomen uchi',h:'Yokomen-uchi',k:'横面打ち',p:'iokomen uchi',l:'golpe al costado de la cabeza',d:'Golpe diagonal con tegatana a la sien o al costado del cuello, como un corte de espada en diagonal.',c:'ata'},
 {t:'Men uchi',h:'Men-uchi',k:'面打ち',p:'men uchi',l:'golpe a la cabeza',d:'Golpe a la cabeza en general. Aparece combinado en kata dori men uchi.',c:'ata'},
 {t:'Tsuki',h:'Tsuki',k:'突き',p:'tski',l:'estocada',d:'Puñetazo o estocada directa. Según la altura se precisa como chudan (medio) o jodan (alto).',c:'ata'},
 {t:'Chudan tsuki',h:'Chūdan-tsuki',k:'中段突き',p:'chúdan tski',l:'estocada al nivel medio',d:'Golpe directo al abdomen o al plexo.',c:'ata'},
 {t:'Jodan tsuki',h:'Jōdan-tsuki',k:'上段突き',p:'yódan tski',l:'estocada al nivel alto',d:'Golpe directo a la cara.',c:'ata'},
-{t:'Ushiro ryote dori',h:'Ushiro ryōte-dori',k:'後ろ両手取り',p:'ushiro riote dori',l:'agarrar ambas manos desde atrás',d:'Uke pasa por detrás de tori y le toma las dos muñecas. En otros programas se llama ushiro ryotekubi dori o ushiro tekubi dori.',c:'ata',alt:['Ushiro ryotekubi dori','Ushiro tekubi dori']},
-{t:'Ushiro ryo kata dori',h:'Ushiro ryōkata-dori',k:'後ろ両肩取り',p:'ushiro rio kata dori',l:'agarrar ambos hombros desde atrás',d:'Uke toma los dos hombros de tori desde atrás.',c:'ata'},
+{t:'Ushiro ryote dori',h:'Ushiro ryōte-dori',k:'後ろ両手取り',p:'ushiro rióte dori',l:'agarrar ambas manos desde atrás',d:'Uke pasa por detrás de tori y le toma las dos muñecas. En otros programas se llama ushiro ryotekubi dori o ushiro tekubi dori.',c:'ata',alt:['Ushiro ryotekubi dori','Ushiro tekubi dori']},
+{t:'Ushiro ryo kata dori',h:'Ushiro ryōkata-dori',k:'後ろ両肩取り',p:'ushiro rió kata dori',l:'agarrar ambos hombros desde atrás',d:'Uke toma los dos hombros de tori desde atrás.',c:'ata'},
 {t:'Ushiro eri dori',h:'Ushiro eri-dori',k:'後ろ襟取り',p:'ushiro eri dori',l:'agarrar el cuello del keikogi desde atrás',d:'Uke toma desde atrás la solapa o el cuello del keikogi, tirando hacia abajo.',c:'ata'},
 {t:'Ushiro katate dori kubi shime',h:'Ushiro katate-dori kubi-shime',k:'後ろ片手取り首絞め',p:'ushiro katate dori kubi shime',l:'agarre de una mano y estrangulación desde atrás',d:'Desde atrás, uke toma una muñeca de tori con una mano y le rodea el cuello con el otro brazo.',c:'ata',alt:['Ushiro kubishime']},
 {t:'Muna dori',h:'Muna-dori',k:'胸取り',p:'muna dori',l:'agarrar el pecho',d:'Uke toma de frente las solapas del keikogi a la altura del pecho.',c:'ata'},
@@ -650,48 +680,48 @@ const GL=[
 {t:'Yonkyo',h:'Yonkyō',k:'四教',p:'ionkió',l:'cuarta enseñanza',d:'Control del antebrazo de uke aplicando presión con la base del índice sobre un punto sensible de la cara interna o externa de la muñeca.',c:'tec',alt:['Tekubi osae']},
 {t:'Gokyo',h:'Gokyō',k:'五教',p:'gokió',l:'quinta enseñanza',d:'Control del brazo parecido a ikkyo, con el agarre invertido. Se usa sobre todo ante ataques con arma, como un cuchillo, para mantener la mano de uke lejos.',c:'tec',alt:['Ude nobashi']},
 {t:'Ikkyo a gokyo',h:'Ikkyō – gokyō',k:'一教〜五教',p:'ikió a gokió',l:'de la primera a la quinta enseñanza',d:'En 1.º kyu el examinador puede pedir cualquiera de las cinco inmovilizaciones ante el mismo ataque, una tras otra.',c:'tec'},
-{t:'Shiho nage',h:'Shihō-nage',k:'四方投げ',p:'shijó naguê',l:'proyección en las cuatro direcciones',d:'Tori toma la muñeca de uke, pasa por debajo de su brazo y lo proyecta hacia atrás doblándole el brazo sobre el hombro, como un corte de espada. Se puede ejecutar hacia cualquier dirección.',c:'tec'},
-{t:'Irimi nage',h:'Irimi-nage',k:'入身投げ',p:'írimi naguê',l:'proyección entrando',d:'Tori entra al costado o a la espalda de uke, lo hace girar alrededor de su propio centro y lo proyecta pasando el brazo por delante de su cuello. En el programa aparece en varias formas (con tenkan de 180° o 360°).',c:'tec'},
-{t:'Tenchi nage',h:'Tenchi-nage',k:'天地投げ',p:'ténchi naguê',l:'proyección cielo y tierra',d:'Con las dos manos tomadas, tori eleva una hacia el cielo y baja la otra hacia la tierra mientras entra, desequilibrando a uke hacia atrás.',c:'tec'},
+{t:'Shiho nage',h:'Shihō-nage',k:'四方投げ',p:'shijó nague',l:'proyección en las cuatro direcciones',d:'Tori toma la muñeca de uke con las dos manos, pasa por debajo de su brazo y gira, de modo que la mano de uke queda junto a su propio hombro; luego corta hacia abajo como con una espada y uke cae hacia atrás. Se puede ejecutar hacia cualquier dirección.',c:'tec'},
+{t:'Irimi nage',h:'Irimi-nage',k:'入身投げ',p:'irimi nague',l:'proyección entrando',d:'Tori entra al costado o a la espalda de uke, lo hace girar alrededor de su propio centro y lo proyecta pasando el brazo por delante de su cuello. En el programa aparece en varias formas (con tenkan de 180° o 360°).',c:'tec'},
+{t:'Tenchi nage',h:'Tenchi-nage',k:'天地投げ',p:'tenchi nague',l:'proyección cielo y tierra',d:'Con las dos manos tomadas, tori eleva una hacia el cielo y baja la otra hacia la tierra mientras entra, desequilibrando a uke hacia atrás.',c:'tec'},
 {t:'Kote gaeshi',h:'Kote-gaeshi',k:'小手返し',p:'kote gaeshi',l:'giro de la muñeca',d:'Tori toma la mano de uke y la gira hacia afuera doblando la muñeca, lo que proyecta a uke de espaldas. Suele terminar con una inmovilización boca abajo.',c:'tec'},
-{t:'Kaiten nage',h:'Kaiten-nage',k:'回転投げ',p:'káiten naguê',l:'proyección en rueda',d:'Tori baja la cabeza de uke y le lleva el brazo en un gran arco hacia adelante, haciéndolo rodar como una rueda. Tiene dos formas: uchi y soto.',c:'tec'},
-{t:'Uchi kaiten nage',h:'Uchi kaiten-nage',k:'内回転投げ',p:'uchi káiten naguê',l:'proyección en rueda por dentro',d:'Forma de kaiten nage en la que tori pasa por debajo del brazo de uke, entrando por su lado interno.',c:'tec'},
-{t:'Soto kaiten nage',h:'Soto kaiten-nage',k:'外回転投げ',p:'soto káiten naguê',l:'proyección en rueda por fuera',d:'Forma de kaiten nage en la que tori se mueve por el exterior de uke, sin pasar bajo su brazo.',c:'tec'},
-{t:'Ude kime nage',h:'Ude-kime-nage',k:'腕極め投げ',p:'ude kime naguê',l:'proyección controlando el brazo',d:'Tori extiende el brazo de uke y lo controla a la altura del codo con su propio brazo mientras avanza, proyectándolo hacia adelante.',c:'tec'},
-{t:'Sokumen irimi nage',h:'Sokumen irimi-nage',k:'側面入身投げ',p:'sokúmen írimi naguê',l:'proyección entrando por el costado',d:'Tori entra al costado de uke y lo proyecta hacia atrás extendiendo el brazo en diagonal por delante de su pecho. El programa la identifica también con naname kokyu nage.',c:'tec'},
-{t:'Naname kokyu nage',h:'Naname kokyū-nage',k:'斜め呼吸投げ',p:'naname kokiú naguê',l:'proyección de respiración en diagonal',d:'Proyección en diagonal, sin tomar a uke, usando el movimiento y la extensión del cuerpo. El programa la equipara con sokumen irimi nage.',c:'tec'},
-{t:'Koshi nage',h:'Koshi-nage',k:'腰投げ',p:'koshi naguê',l:'proyección por la cadera',d:'Tori baja su centro, coloca la cadera cruzada bajo el centro de uke y lo hace pasar por encima. Pide ukemi alto y cuidadoso.',c:'tec'},
+{t:'Kaiten nage',h:'Kaiten-nage',k:'回転投げ',p:'kaiten nague',l:'proyección en rueda',d:'Tori baja la cabeza de uke y le lleva el brazo en un gran arco hacia adelante, haciéndolo rodar como una rueda. Tiene dos formas: uchi y soto.',c:'tec'},
+{t:'Uchi kaiten nage',h:'Uchi kaiten-nage',k:'内回転投げ',p:'uchi kaiten nague',l:'proyección en rueda por dentro',d:'Forma de kaiten nage en la que tori pasa por debajo del brazo de uke, entrando por su lado interno.',c:'tec'},
+{t:'Soto kaiten nage',h:'Soto kaiten-nage',k:'外回転投げ',p:'soto kaiten nague',l:'proyección en rueda por fuera',d:'Forma de kaiten nage en la que tori se mueve por el exterior de uke, sin pasar bajo su brazo.',c:'tec'},
+{t:'Ude kime nage',h:'Ude-kime-nage',k:'腕極め投げ',p:'ude kime nague',l:'proyección controlando el brazo',d:'Tori extiende el brazo de uke y lo controla a la altura del codo con su propio brazo mientras avanza, proyectándolo hacia adelante.',c:'tec'},
+{t:'Sokumen irimi nage',h:'Sokumen irimi-nage',k:'側面入身投げ',p:'sokumen irimi nague',l:'proyección entrando por el costado',d:'Tori entra al costado de uke y lo proyecta hacia atrás extendiendo el brazo en diagonal por delante de su pecho. El programa la identifica también con naname kokyu nage.',c:'tec'},
+{t:'Naname kokyu nage',h:'Naname kokyū-nage',k:'斜め呼吸投げ',p:'naname kokiú nague',l:'proyección de respiración en diagonal',d:'Proyección en diagonal que no se apoya en una luxación sino en la entrada y la extensión del cuerpo. El programa la equipara con sokumen irimi nage.',c:'tec'},
+{t:'Koshi nage',h:'Koshi-nage',k:'腰投げ',p:'koshi nague',l:'proyección por la cadera',d:'Tori baja su centro, coloca la cadera cruzada bajo el centro de uke y lo hace pasar por encima. Pide ukemi alto y cuidadoso.',c:'tec'},
 {t:'Sumi otoshi',h:'Sumi-otoshi',k:'隅落とし',p:'sumi otoshi',l:'derribo hacia la esquina',d:'Tori desequilibra a uke hacia su ángulo débil (la «esquina» detrás de su pie) con un movimiento amplio del brazo.',c:'tec'},
 {t:'Aiki otoshi',h:'Aiki-otoshi',k:'合気落とし',p:'aiki otoshi',l:'derribo con aiki',d:'Ante un agarre desde atrás, tori se ubica al costado de uke, se agacha y levanta sus piernas por detrás de las rodillas para proyectarlo hacia atrás.',c:'tec'},
 {t:'Hiji kime osae',h:'Hiji-kime-osae',k:'肘極め抑え',p:'jiyi kime osae',l:'inmovilización controlando el codo',d:'Tori extiende el brazo de uke y controla la articulación del codo hasta llevarlo al suelo.',c:'tec'},
 {t:'Juji garami',h:'Jūji-garami',k:'十字絡み',p:'yúyi garami',l:'enlace en cruz',d:'Tori cruza los brazos de uke uno sobre otro, de modo que quedan trabados en forma de cruz (十), y lo proyecta hacia atrás.',c:'tec',alt:['Juji nage']},
 {t:'Ude garami',h:'Ude-garami',k:'腕絡み',p:'ude garami',l:'enlace del brazo',d:'Tori envuelve y traba el brazo de uke doblándolo. En el programa se pide con entrada uchi kaiten.',c:'tec'},
-{t:'Kokyu nage',h:'Kokyū-nage',k:'呼吸投げ',p:'kokiú naguê',l:'proyección de respiración',d:'Familia de proyecciones que no dependen de luxar una articulación sino del ritmo, el desequilibrio y la unión de movimientos. En jiyu waza, desde 3.º kyu, el programa pide solo este tipo de técnicas.',c:'tec'},
+{t:'Kokyu nage',h:'Kokyū-nage',k:'呼吸投げ',p:'kokiú nague',l:'proyección de respiración',d:'Familia de proyecciones que no dependen de luxar una articulación sino del ritmo, el desequilibrio y la unión de movimientos. En jiyu waza, desde 3.º kyu, el programa pide solo este tipo de técnicas.',c:'tec'},
 {t:'Kiri gaeshi',h:'Kiri-kaeshi',k:'切り返し',p:'kiri gaeshi',l:'cortar y volver',d:'Movimiento de corte que cambia de dirección, como la espada que corta y regresa. En el programa nombra una forma de gokyo y de sankyo.',c:'tec',alt:['Kiri kaeshi']},
 {t:'Jiyu waza',h:'Jiyū-waza',k:'自由技',p:'yiyú waza',l:'técnica libre',d:'Uke ataca de manera continua y tori responde con técnicas a su elección, sin pausa. Evalúa fluidez, ritmo y control del espacio.',c:'tec',alt:['Jiju waza','Yiyu waza']},
-{t:'Nage waza',h:'Nage-waza',k:'投げ技',p:'naguê waza',l:'técnicas de proyección',d:'Técnicas que terminan con uke proyectado (shiho nage, irimi nage, kote gaeshi, entre otras).',c:'tec'},
+{t:'Nage waza',h:'Nage-waza',k:'投げ技',p:'nague waza',l:'técnicas de proyección',d:'Técnicas que terminan con uke proyectado (shiho nage, irimi nage, kote gaeshi, entre otras).',c:'tec'},
 {t:'Katame waza',h:'Katame-waza',k:'固め技',p:'katame waza',l:'técnicas de control',d:'Técnicas que terminan inmovilizando a uke en el suelo (de ikkyo a gokyo). También se las llama osae waza.',c:'tec',alt:['Osae waza']},
 // posiciones y modalidades
 {t:'Tachi waza',h:'Tachi-waza',k:'立ち技',p:'tachi waza',l:'técnicas de pie',d:'Tori y uke trabajan de pie. Es la mayor parte del programa de cada grado.',c:'pos'},
 {t:'Suwari waza',h:'Suwari-waza',k:'座り技',p:'suwari waza',l:'técnicas sentados',d:'Tori y uke trabajan de rodillas, desplazándose en shikko. Fortalece la cadera y obliga a mover el centro sin usar las piernas como apoyo.',c:'pos',alt:['Zagi','Za waza']},
 {t:'Hanmi handachi waza',h:'Hanmi-handachi-waza',k:'半身半立ち技',p:'janmi jandachi waza',l:'técnicas medio sentado, medio de pie',d:'Tori está de rodillas y uke ataca de pie. Aparece desde 3.º kyu.',c:'pos',alt:['Hami-handachi waza']},
 {t:'Hanmi',h:'Hanmi',k:'半身',p:'janmi',l:'medio cuerpo',d:'Postura triangular básica, con un pie adelantado y el cuerpo de perfil a medias. Reduce el blanco y permite moverse en todas las direcciones.',c:'pos'},
-{t:'Ai hanmi',h:'Ai-hanmi',k:'相半身',p:'ái janmi',l:'medio cuerpo igual',d:'Tori y uke con el mismo pie adelante (derecha con derecha, izquierda con izquierda).',c:'pos'},
+{t:'Ai hanmi',h:'Ai-hanmi',k:'相半身',p:'ai janmi',l:'medio cuerpo igual',d:'Tori y uke con el mismo pie adelante (derecha con derecha, izquierda con izquierda).',c:'pos'},
 {t:'Gyaku hanmi',h:'Gyaku-hanmi',k:'逆半身',p:'guiaku janmi',l:'medio cuerpo inverso',d:'Tori y uke con pies opuestos adelante (derecha frente a izquierda).',c:'pos'},
 {t:'Kamae',h:'Kamae',k:'構え',p:'kamae',l:'guardia, postura',d:'Postura de preparación, con o sin arma. Incluye la actitud mental de disponibilidad.',c:'pos'},
-{t:'Seiza',h:'Seiza',k:'正座',p:'séiza',l:'sentarse correctamente',d:'Sentado de rodillas sobre los talones, con la espalda recta. Es la posición del saludo y de las explicaciones.',c:'pos'},
+{t:'Seiza',h:'Seiza',k:'正座',p:'seiza',l:'sentarse correctamente',d:'Sentado de rodillas sobre los talones, con la espalda recta. Es la posición del saludo y de las explicaciones.',c:'pos'},
 {t:'Shikko',h:'Shikkō',k:'膝行',p:'shikó',l:'andar de rodillas',d:'Forma de desplazarse de rodillas pivotando sobre ellas. Base de suwari waza.',c:'pos'},
 // movimiento y conceptos
 {t:'Omote',h:'Omote',k:'表',p:'omote',l:'frente, lo visible',d:'Variante en la que tori entra por delante de uke, cruzando su línea de ataque.',c:'mov'},
 {t:'Ura',h:'Ura',k:'裏',p:'ura',l:'dorso, lo oculto',d:'Variante en la que tori gira por detrás de uke (normalmente con tenkan), acompañando su fuerza.',c:'mov'},
-{t:'Irimi',h:'Irimi',k:'入身',p:'írimi',l:'entrar con el cuerpo',d:'Entrada directa hacia el costado o la espalda de uke, fuera de la línea de su ataque.',c:'mov'},
+{t:'Irimi',h:'Irimi',k:'入身',p:'irimi',l:'entrar con el cuerpo',d:'Entrada directa hacia el costado o la espalda de uke, fuera de la línea de su ataque.',c:'mov'},
 {t:'Tenkan',h:'Tenkan',k:'転換',p:'tenkan',l:'girar, cambiar de dirección',d:'Giro de unos 180° sobre el pie adelantado para quedar mirando en la misma dirección que uke. Las formas del programa indican 180° o 360°.',c:'mov'},
 {t:'Tai sabaki',h:'Tai-sabaki',k:'体捌き',p:'tai sabaki',l:'manejo del cuerpo',d:'Conjunto de desplazamientos y giros (irimi, tenkan, tenshin, entre otros) con los que tori sale de la línea de ataque.',c:'mov'},
 {t:'Interior',h:'Uchi',k:'内',p:'uchi',l:'adentro',d:'En el programa, variante que se realiza por el lado interno del brazo de uke (entre sus brazos). En japonés: uchi.',c:'mov',alt:['Uchi']},
 {t:'Exterior',h:'Soto',k:'外',p:'soto',l:'afuera',d:'Variante que se realiza por el lado externo del brazo de uke. En japonés: soto.',c:'mov',alt:['Soto']},
-{t:'Ukemi',h:'Ukemi',k:'受身',p:'úkemi',l:'recibir con el cuerpo',d:'El arte de caer y recibir la técnica sin lastimarse: rodadas hacia adelante (mae ukemi), hacia atrás (ushiro ukemi) y caídas altas. Aprender a ser uke es la mitad del Aikido.',c:'mov'},
+{t:'Ukemi',h:'Ukemi',k:'受身',p:'ukemi',l:'recibir con el cuerpo',d:'El arte de caer y recibir la técnica sin lastimarse: rodadas hacia adelante (mae ukemi), hacia atrás (ushiro ukemi) y caídas altas. Aprender a ser uke es la mitad del Aikido.',c:'mov'},
 {t:'Ma-ai',h:'Ma-ai',k:'間合い',p:'ma ai',l:'distancia armoniosa',d:'Distancia justa entre tori y uke: suficiente para no ser alcanzado y para poder intervenir.',c:'mov'},
-{t:'Atemi',h:'Atemi',k:'当身',p:'átemi',l:'golpe al cuerpo',d:'Golpe o amago que distrae o desequilibra dentro de una técnica.',c:'mov'},
+{t:'Atemi',h:'Atemi',k:'当身',p:'atemi',l:'golpe al cuerpo',d:'Golpe o amago que distrae o desequilibra dentro de una técnica.',c:'mov'},
 {t:'Kuzushi',h:'Kuzushi',k:'崩し',p:'kuzushi',l:'romper',d:'Desequilibrio de uke. Sin kuzushi no hay técnica: es lo que permite proyectar sin fuerza.',c:'mov'},
 {t:'Zanshin',h:'Zanshin',k:'残心',p:'zanshin',l:'espíritu que permanece',d:'Atención sostenida al terminar la técnica: tori sigue presente y conectado con uke.',c:'mov'},
 {t:'Tegatana',h:'Tegatana',k:'手刀',p:'tegatana',l:'mano espada',d:'El canto de la mano usado como si fuera el filo de una espada. Con él se ataca en shomen uchi y yokomen uchi.',c:'mov'},
@@ -700,7 +730,7 @@ const GL=[
 {t:'Ki',h:'Ki',k:'気',p:'ki',l:'energía, espíritu',d:'Energía vital. En la práctica se traduce en intención, extensión y presencia.',c:'mov'},
 {t:'Musubi',h:'Musubi',k:'結び',p:'musubi',l:'unión, nudo',d:'Conexión entre el movimiento de uke y el de tori, que permite guiar el ataque en lugar de chocarlo.',c:'mov'},
 {t:'Waza',h:'Waza',k:'技',p:'waza',l:'técnica',d:'Técnica. Aparece compuesta en tachi waza, suwari waza, jiyu waza y otras.',c:'mov'},
-{t:'Nage',h:'Nage',k:'投げ',p:'naguê',l:'proyectar; quien proyecta',d:'Proyección. También se usa para nombrar a quien ejecuta la técnica (tori).',c:'mov'},
+{t:'Nage',h:'Nage',k:'投げ',p:'nague',l:'proyectar; quien proyecta',d:'Proyección. También se usa para nombrar a quien ejecuta la técnica (tori).',c:'mov'},
 {t:'Dori',h:'Dori / tori',k:'取り',p:'dori',l:'tomar, agarrar',d:'Agarre. Como sufijo nombra un ataque (katate dori) o una defensa ante un arma (tanto dori). La t inicial se vuelve d al componer la palabra.',c:'mov'},
 {t:'Uchi',h:'Uchi',k:'打ち',p:'uchi',l:'golpe',d:'Golpe (con 打, en shomen uchi o yokomen uchi). Ojo: el mismo sonido con 内 significa «adentro», como en uchi kaiten.',c:'mov'},
 {t:'Osae',h:'Osae',k:'抑え',p:'osae',l:'contener, sujetar',d:'Inmovilización final en el suelo.',c:'mov'},
@@ -708,7 +738,7 @@ const GL=[
 {t:'Taninzu gake',h:'Taninzu-gake',k:'多人数掛け',p:'taninzu gake',l:'contra muchas personas',d:'Práctica contra tres o más atacantes. Se pide desde 3.º dan.',c:'mov',alt:['Taninzugake']},
 // dojo y etiqueta
 {t:'Aikido',h:'Aikidō',k:'合気道',p:'aikidó',l:'camino de la armonía con la energía',d:'Arte marcial creado por Morihei Ueshiba en el siglo XX. No tiene competencias: se aprende en parejas que se alternan los roles de tori y uke.',c:'dojo'},
-{t:'Aikikai',h:'Aikikai',k:'合気会',p:'aikikai',l:'asociación de aiki',d:'Fundación con sede en el Hombu Dojo de Tokio, dirigida por la familia Ueshiba. Es la organización de Aikido con más alcance en el mundo.',c:'dojo'},
+{t:'Aikikai',h:'Aikikai',k:'合気会',p:'aikikai',l:'asociación de aiki',d:'Fundación con sede en el Hombu Dojo de Tokio, dirigida por la familia Ueshiba. Es una de las organizaciones de Aikido más extendidas del mundo.',c:'dojo'},
 {t:'O-Sensei',h:'Ō-sensei',k:'大先生',p:'o sensei',l:'gran maestro',d:'Forma respetuosa de nombrar a Morihei Ueshiba (1883-1969), fundador del Aikido.',c:'dojo'},
 {t:'Doshu',h:'Dōshu',k:'道主',p:'dóshu',l:'guardián del camino',d:'Título del líder del Aikikai, heredado en la familia Ueshiba.',c:'dojo'},
 {t:'Hombu Dojo',h:'Honbu dōjō',k:'本部道場',p:'jombu doyó',l:'dojo central',d:'Sede mundial del Aikikai en Tokio.',c:'dojo'},
@@ -725,8 +755,21 @@ const GL=[
 {t:'Obi',h:'Obi',k:'帯',p:'obi',l:'cinturón',d:'Cinturón. El color indica el grado en este programa.',c:'dojo'},
 {t:'Keiko',h:'Keiko',k:'稽古',p:'keiko',l:'reflexionar sobre lo antiguo',d:'Práctica, entrenamiento.',c:'dojo'},
 {t:'Rei',h:'Rei',k:'礼',p:'rei',l:'cortesía, saludo',d:'Saludo con inclinación, de pie (ritsurei) o en seiza (zarei).',c:'dojo'},
-{t:'Onegaishimasu',h:'Onegai shimasu',k:'お願いします',p:'onegaishimás',l:'por favor',d:'Se dice al saludar a la pareja antes de practicar: «por favor, practiquemos juntos».',c:'dojo'},
-{t:'Domo arigato gozaimashita',h:'Dōmo arigatō gozaimashita',k:'どうもありがとうございました',p:'dómo arigató gozaimáshta',l:'muchas gracias (por lo hecho)',d:'Agradecimiento formal al terminar la práctica o la clase.',c:'dojo'},
+{t:'Onegaishimasu',h:'Onegai shimasu',k:'お願いします',p:'onegaishimas',l:'por favor',d:'Se dice al saludar a la pareja antes de practicar: «por favor, practiquemos juntos».',c:'dojo'},
+{t:'Domo arigato gozaimashita',h:'Dōmo arigatō gozaimashita',k:'どうもありがとうございました',p:'dómo arigató gozaimashta',l:'muchas gracias (por lo hecho)',d:'Agradecimiento formal al terminar la práctica o la clase.',c:'dojo'},
+{t:'Ritsurei',h:'Ritsurei',k:'立礼',p:'ritsurei',l:'saludo de pie',d:'Inclinación desde la cintura, con la espalda recta y las manos a los costados. Se hace al entrar y salir del dojo o del tatami.',c:'dojo'},
+{t:'Zarei',h:'Zarei',k:'座礼',p:'zarei',l:'saludo sentado',d:'Saludo desde seiza: se apoya primero la mano izquierda y luego la derecha, formando un triángulo frente a las rodillas, y se inclina el torso. Al volver, primero la derecha y luego la izquierda.',c:'dojo'},
+{t:'Shomen ni rei',h:'Shōmen ni rei',k:'正面に礼',p:'shómen ni rei',l:'saludo al frente',d:'Voz de mando para saludar hacia el kamiza al comenzar y terminar la clase.',c:'dojo'},
+{t:'Sensei ni rei',h:'Sensei ni rei',k:'先生に礼',p:'sensei ni rei',l:'saludo al maestro',d:'Voz de mando para saludar a quien dirige la clase.',c:'dojo'},
+{t:'Otagai ni rei',h:'Otagai ni rei',k:'お互いに礼',p:'otagai ni rei',l:'saludo mutuo',d:'Voz de mando para que todos se saluden entre sí.',c:'dojo'},
+{t:'Hai',h:'Hai',k:'はい',p:'jai',l:'sí',d:'Respuesta breve que confirma que entendiste una indicación.',c:'dojo'},
+{t:'Sumimasen',h:'Sumimasen',k:'すみません',p:'sumimasen',l:'disculpa',d:'Para pedir disculpas (por ejemplo, si chocaste o lastimaste a alguien) o para llamar la atención con respeto.',c:'dojo'},
+{t:'Shitsurei shimasu',h:'Shitsurei shimasu',k:'失礼します',p:'shtsurei shimas',l:'cometo una descortesía',d:'Se dice al entrar o salir, al interrumpir o al pasar cerca de alguien: «con permiso».',c:'dojo'},
+{t:'Otsukaresama deshita',h:'Otsukaresama deshita',k:'お疲れ様でした',p:'otskaresama deshta',l:'gracias por tu esfuerzo',d:'Saludo entre compañeros al terminar la práctica: reconoce el cansancio y el trabajo del otro.',c:'dojo'},
+{t:'Agura',h:'Agura',k:'胡座',p:'agura',l:'sentado con piernas cruzadas',d:'Posición alternativa a seiza si una lesión te impide arrodillarte. Conviene avisar al sensei.',c:'dojo'},
+{t:'Soji',h:'Sōji',k:'掃除',p:'sóyi',l:'limpieza',d:'Limpieza del tatami y del dojo entre todos, habitual al final de la clase. Forma parte de la práctica.',c:'dojo'},
+{t:'Zori',h:'Zōri',k:'草履',p:'sóri',l:'sandalias',d:'Sandalias para caminar fuera del tatami; se dejan en el borde, con la punta hacia afuera.',c:'dojo'},
+{t:'Reigi',h:'Reigi',k:'礼儀',p:'reigui',l:'cortesía, etiqueta',d:'Conjunto de normas de respeto del dojo. Protege a quienes practican y da forma a la clase.',c:'dojo'},
 {t:'Mokuso',h:'Mokusō',k:'黙想',p:'mokusó',l:'meditación en silencio',d:'Breve meditación en seiza al empezar o terminar la clase.',c:'dojo'},
 // grados
 {t:'Kyu',h:'Kyū',k:'級',p:'kiú',l:'clase, nivel',d:'Grado previo al cinturón negro. Se cuenta hacia abajo: del 5.º kyu (inicial) al 1.º kyu (último antes de dan).',c:'gra'},
@@ -961,6 +1004,78 @@ function renderMap(){
   $$('#mtx .dot').forEach(b=>b.onclick=()=>{const k=norm(b.dataset.mt).replace(/ /g,'-');openGrade(b.dataset.mg,`t-${b.dataset.mg}-${mapMod}-${k}`)});
 }
 
+/* ============ DOJO ============ */
+const DOJO={
+ entrar:[
+  'Llega unos minutos antes para cambiarte con calma y estar en el tatami antes del saludo inicial.',
+  'Al entrar al dojo y al subir al tatami, haz ritsurei hacia el kamiza. Al salir, lo mismo.',
+  'Deja las zori en el borde del tatami, con la punta hacia afuera. Sobre el tatami se está descalzo; fuera de él, calzado.',
+  'Si llegas tarde, espera en seiza al borde del tatami hasta que el sensei te indique pasar; entonces haz zarei y súmate sin interrumpir.'],
+ apertura:[
+  ['Formar la línea','Todos en seiza, de frente al kamiza. En muchos dojos se ordenan por grado.'],
+  ['Mokuso','Unos momentos de silencio con los ojos entrecerrados para dejar afuera el día.'],
+  ['Saludo al kamiza','El sensei se vuelve hacia el kamiza y todos saludan juntos. En muchos dojos Aikikai el gesto es: saludo, dos palmadas, saludo.'],
+  ['Saludo al sensei','El sensei se vuelve hacia la clase, se saludan mutuamente y todos dicen «Onegaishimasu».'],
+  ['Al terminar','Se repite el orden: saludo al kamiza y luego al sensei, esta vez con «Dōmo arigatō gozaimashita». Después, cada quien agradece a sus compañeros de práctica.']],
+ frases:[
+  ['Onegaishimasu','お願いします','onegaishimas','Al empezar la clase y al saludar a cada pareja antes de practicar: «por favor, practiquemos».'],
+  ['Dōmo arigatō gozaimashita','どうもありがとうございました','dómo arigató gozaimashta','Al terminar la clase y al separarte de cada pareja.'],
+  ['Hai','はい','jai','Para confirmar que entendiste una indicación del sensei.'],
+  ['Sumimasen','すみません','sumimasen','Si chocaste o lastimaste a alguien, o para llamar la atención con respeto.'],
+  ['Shitsurei shimasu','失礼します','shtsurei shimas','Al entrar o salir, o si necesitas pasar o interrumpir: «con permiso».'],
+  ['Otsukaresama deshita','お疲れ様でした','otskaresama deshta','Entre compañeros, al final: reconoce el esfuerzo del otro.'],
+  ['Ohayō gozaimasu','おはようございます','ojaió gozaimas','Buen día, hasta media mañana.'],
+  ['Konnichiwa / Konbanwa','こんにちは／こんばんは','konnichiwa / kombanwa','Buenas tardes o buenas noches, al llegar.']],
+ si:[
+  ['Saluda a tu pareja antes y después de practicar juntos.',''],
+  ['Ataca con sinceridad y ajusta la intensidad a tu pareja.','Un ataque honesto le permite a tori aprender; uno excesivo no deja aprender a nadie.'],
+  ['Alterna los roles de tori y uke con las repeticiones que indique el sensei.','Lo más común es alternar cada cuatro repeticiones, dos por lado.'],
+  ['Practica la técnica que mostró el sensei.','Si no la recuerdas, mira a otra pareja o pregunta en voz baja.'],
+  ['Cuando el sensei llama o aplaude, detente, saluda a tu pareja y siéntate en seiza enseguida.',''],
+  ['Avisa antes de la clase si tienes una lesión o una molestia.','Así tu pareja y el sensei pueden cuidarte.'],
+  ['Palmea el tatami o a tu pareja cuando la técnica ya es suficiente, y suelta en cuanto tu pareja palmee.',''],
+  ['Pide permiso al sensei para salir del tatami, aunque sea un momento.',''],
+  ['Mantén el keikogi limpio, las uñas cortas y el cabello recogido.','Es una forma de cuidar a quien practica contigo.'],
+  ['Si necesitas descansar, siéntate al borde del tatami en seiza o agura.','']],
+ no:[
+  ['No hables durante la explicación ni conviertas la práctica en una charla.','El Aikido se aprende más con el cuerpo que con palabras.'],
+  ['No corrijas a tu pareja si no te lo pide; esa tarea es del sensei.','Si tienes más experiencia, enseña con tu ataque y tu ukemi.'],
+  ['No resistas para «probar» si la técnica funciona.','Bloquear enseña poco y lesiona mucho.'],
+  ['No fuerces las articulaciones ni aceleres una proyección más de lo que tu pareja puede recibir.',''],
+  ['No uses anillos, relojes, aros ni otros accesorios.',''],
+  ['No comas, bebas ni mastiques chicle sobre el tatami; tampoco uses el celular.',''],
+  ['No te recuestes, no te apoyes en la pared ni estires las piernas hacia el kamiza.',''],
+  ['No cruces entre el sensei y la clase mientras demuestra, ni junto a una pareja que está proyectando.',''],
+  ['No pises ni pases por encima de un bokken, un jo o un tanto.','Las armas se pasan y se guardan con respeto.']],
+ examen:[
+  ['Al oír tu nombre, respondes «Hai» y te desplazas en shikko a tu lugar.',''],
+  ['Te sientas en seiza de frente al kamiza, con tu uke detrás.',''],
+  ['Saludas al kamiza, al examinador y a tu uke, en ese orden.','Al terminar, en el orden inverso.'],
+  ['Ejecutas lo que te piden, con zanshin hasta el final de cada técnica.',''],
+  ['Cuando el examinador lo indica, saludas y vuelves a tu lugar.','']]
+};
+let DOJO_USED=new Set();
+function linkDojo(html){
+  const names=['Onegaishimasu','Dōmo arigatō gozaimashita','ritsurei','zarei','reigi','kamiza','sensei','seiza','agura','shikko','zori','Mokuso','keikogi','tori','uke','ukemi','bokken','jo','tanto','zanshin','Hai','tatami'];
+  const used=DOJO_USED;
+  names.forEach(n=>{const i=gFind(n);if(i==null||used.has(i))return;
+    const re=new RegExp('(^|[\\s«(¿¡,.;:])('+n+')(?=[\\s»),.;:!?]|$)','i');
+    if(re.test(html)){used.add(i);html=html.replace(re,(m,pre,w)=>pre+`<button class="term" data-g="${i}">${w}</button>`)}});
+  return html;
+}
+function renderDojo(){
+  DOJO_USED=new Set();
+  const T=t=>linkDojo(esc(t));
+  $('#dojoBody').innerHTML=`
+  <section class="dsec"><h2>Entrar al dojo</h2><p class="desc">Antes de que empiece la clase.</p><div class="box"><ul>${DOJO.entrar.map(x=>`<li>${T(x)}</li>`).join('')}</ul></div></section>
+  <section class="dsec"><h2>Saludo de apertura y cierre</h2><p class="desc">La secuencia más extendida en dojos Aikikai.</p><ol class="steps">${DOJO.apertura.map(([a,b])=>`<li><div><b>${T(a)}</b><small>${T(b)}</small></div></li>`).join('')}</ol></section>
+  <section class="dsec"><h2>Saludos y frases</h2><p class="desc">Lo que vas a decir y escuchar. La pronunciación es aproximada.</p><div class="phr">${DOJO.frases.map(([a,k,pr,d])=>`<div><b>${esc(a)}</b><span class="kj" lang="ja">${k}</span><span class="pr">se pronuncia «${esc(pr)}»</span><p>${T(d)}</p></div>`).join('')}</div></section>
+  <section class="dsec"><h2>En el horario de práctica</h2><p class="desc">Qué se hace y qué no se hace sobre el tatami.</p><div class="dodont">
+    <div><h3><span class="mk" aria-hidden="true">○</span>Sí</h3><ul>${DOJO.si.map(([a,b])=>`<li>${T(a)}${b?`<small>${T(b)}</small>`:''}</li>`).join('')}</ul></div>
+    <div><h3><span class="mk" aria-hidden="true">✕</span>No</h3><ul>${DOJO.no.map(([a,b])=>`<li>${T(a)}${b?`<small>${T(b)}</small>`:''}</li>`).join('')}</ul></div></div></section>
+  <section class="dsec"><h2>El día del examen</h2><p class="desc">Una forma habitual de presentarse. El examinador puede indicar otra.</p><ol class="steps">${DOJO.examen.map(([a,b])=>`<li><div>${T(a)}${b?`<small>${T(b)}</small>`:''}</div></li>`).join('')}</ol></section>`;
+}
+
 /* ============ DANES ============ */
 function renderDans(){$('#dans').innerHTML=DANS.map(d=>`<div class="dan"><div><div class="dk" lang="ja">${d.k}</div><div class="dn">${d.n}, ${d.r}</div></div><div><p>${linkTerms(d.t)}</p><div class="orig">${esc(d.o)}</div></div></div>`).join('')}
 function linkTerms(txt){
@@ -1086,9 +1201,9 @@ $('#vidFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const v=$('#bg
 };
 
 /* ============ inicio ============ */
-renderHome();renderGlossCats();renderGloss();renderMap();renderDans();
+renderHome();renderGlossCats();renderGloss();renderMap();renderDans();renderDojo();
 const h=location.hash.slice(1);
-if(h.startsWith('programa-')){gradeId=h.split('-')[1]||'5';go('programa')}else if(['programa','tecnicas','glosario','danes','practica'].includes(h))go(h);else go('inicio');
+if(h.startsWith('programa-')){gradeId=h.split('-')[1]||'5';go('programa')}else if(['programa','tecnicas','glosario','danes','dojo','practica'].includes(h))go(h);else go('inicio');
 </script>
 </body>
 </html>
