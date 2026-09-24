@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aiki wiki — programa de exámenes y glosario de Aikido</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1E2740;          /* hakama */
+  --panel:rgba(22,29,50,.8);
+  --panel-solid:#19213A;
+  --line:rgba(201,183,122,.22);
+  --text:#EEEAE0;        /* keikogi */
+  --muted:#A9AEC0;
+  --igusa:#C9B77A;       /* paja del tatami */
+  --igusa-strong:#E0CF93;
+  --focus:#F3E3A6;
+  --shadow:0 18px 50px rgba(5,8,18,.45);
+  --serif:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP",Georgia,serif;
+  --sans:"Zen Kaku Gothic New","Hiragino Sans","Segoe UI",system-ui,sans-serif;
+  --b5:#E8C22B;--b4:#E8862A;--b3:#3FA35A;--b2:#2F8FD8;--b1:#8E4E26;--bd:#0E0F12;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#DCD8C4;--panel:rgba(246,244,236,.9);--panel-solid:#F6F4EC;--line:rgba(30,39,64,.16);
+    --text:#1E2740;--muted:#4F5670;--igusa:#6E5F24;--igusa-strong:#57491A;--focus:#1E2740;
+    --shadow:0 18px 44px rgba(30,39,64,.18);color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#DCD8C4;--panel:rgba(246,244,236,.9);--panel-solid:#F6F4EC;--line:rgba(30,39,64,.16);
+  --text:#1E2740;--muted:#4F5670;--igusa:#6E5F24;--igusa-strong:#57491A;--focus:#1E2740;
+  --shadow:0 18px 44px rgba(30,39,64,.18);color-scheme:light;
+}
+:root[data-theme="dark"]{color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--bg);color:var(--text);font:400 15.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--igusa-strong)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- fondo en movimiento ---------- */
+#stage{position:fixed;inset:0;z-index:0;overflow:hidden}
+#stage canvas,#stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#bgVideo{display:none;filter:saturate(.7) brightness(.55)}
+#stage::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 62% 50%,transparent 35%,rgba(10,13,24,.55) 100%)}
+:root[data-theme="light"] #stage::after{background:radial-gradient(120% 90% at 62% 50%,transparent 40%,rgba(220,216,196,.6) 100%)}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) #stage::after{background:radial-gradient(120% 90% at 62% 50%,transparent 40%,rgba(220,216,196,.6) 100%)}}
+.grain{position:absolute;inset:-50%;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+
+/* ---------- estructura PC ---------- */
+.app{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:232px minmax(0,1fr) 380px;gap:18px;padding:18px}
+.app.nodock{grid-template-columns:232px minmax(0,1fr)}
+.app.nodock .dock{display:none}
+.app{grid-template-rows:minmax(0,1fr)}
+.side,.main,.dock{background:var(--panel);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);min-height:0}
+.side{display:flex;flex-direction:column;padding:20px 14px 14px;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px 18px;border-bottom:1px solid var(--line);margin-bottom:12px;text-decoration:none;color:inherit}
+.brand .mark{font:800 34px/1 var(--serif);color:var(--igusa-strong);letter-spacing:-.02em}
+.brand .name{font:700 19px/1.1 var(--serif)}
+.brand small{display:block;font:400 12px/1.3 var(--sans);color:var(--muted);margin-top:3px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:9px;color:var(--muted)}
+.nav button .k{font:700 17px/1 var(--serif);width:24px;text-align:center;color:var(--igusa)}
+.nav button:hover{background:rgba(201,183,122,.08);color:var(--text)}
+.nav button[aria-current="page"]{background:rgba(201,183,122,.14);color:var(--text)}
+.nav button:focus-visible{outline:2px solid var(--focus)}
+.side .belts{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.beltlink{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:8px;font-size:14px;color:var(--muted)}
+.beltlink:hover,.beltlink[aria-current="true"]{color:var(--text);background:rgba(201,183,122,.08)}
+.beltlink:focus-visible{outline:2px solid var(--focus)}
+.beltlink i{width:26px;height:8px;border-radius:3px;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.beltlink .pc{margin-left:auto;font-size:12px;font-variant-numeric:tabular-nums}
+.side .foot{margin-top:auto;display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid var(--line)}
+.tog{all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);padding:5px 8px;border-radius:7px}
+.tog:hover{color:var(--text)}
+.tog:focus-visible{outline:2px solid var(--focus)}
+.bgcap{font-size:12px;color:var(--muted);padding:2px 8px;line-height:1.4}
+.bgcap b{color:var(--igusa-strong);font-weight:500}
+
+.main{overflow:auto;padding:0;scroll-behavior:smooth}
+.main.window{background:linear-gradient(to bottom,transparent 0,transparent 380px,var(--panel) 470px);backdrop-filter:none;-webkit-backdrop-filter:none}
+.main.window .hero{border-bottom-color:transparent;min-height:340px}
+.main.window .hero h1,.main.window .hero .lead{text-shadow:0 1px 14px var(--bg),0 0 2px var(--bg)}
+.main.window .hero .lead{color:var(--text);max-width:44ch}
+.view{display:none;padding:30px 36px 48px}
+.view.on{display:block}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0;line-height:1.2}
+h1{font-size:40px}
+h2{font-size:26px}
+h3{font-size:19px}
+p{margin:0 0 12px;max-width:72ch}
+.lead{font-size:17px;color:var(--muted);max-width:64ch}
+
+/* inicio */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:center;padding:10px 0 26px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.hero .kanji{font:800 104px/1 var(--serif);color:var(--igusa-strong);writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.04em;align-self:stretch;text-shadow:0 2px 30px rgba(0,0,0,.25)}
+.hero h1{font-size:52px;margin-bottom:10px}
+.ladder{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:8px 0 28px}
+.rung{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:14px 14px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);position:relative;overflow:hidden}
+.rung:hover{border-color:var(--igusa)}
+.rung:focus-visible{outline:2px solid var(--focus)}
+.rung .obi{height:10px;border-radius:3px;margin-bottom:6px}
+.rung .gk{font:700 26px/1 var(--serif)}
+.rung .gn{font-size:13px;color:var(--muted)}
+.rung .gs{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.cols h3{margin-bottom:6px}
+.cols p{font-size:14.5px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);border-left:3px solid var(--igusa);padding:6px 12px;margin-top:22px;max-width:80ch}
+
+/* programa */
+.ghead{display:flex;gap:26px;align-items:flex-end;padding-bottom:18px;margin-bottom:6px;position:relative}
+.ghead .gkan{font:800 64px/1 var(--serif);color:var(--igusa-strong)}
+.ghead .meta{font-size:14px;color:var(--muted)}
+.ghead .bar{position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px}
+.gstats{display:flex;gap:22px;margin:14px 0 4px;flex-wrap:wrap}
+.gstats div{font-size:13px;color:var(--muted)}
+.gstats b{display:block;font:700 24px/1.1 var(--serif);color:var(--text);font-variant-numeric:tabular-nums}
+.tools{position:sticky;top:0;z-index:3;display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 0;margin:10px 0 6px;background:linear-gradient(var(--panel-solid) 75%,transparent)}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{all:unset;cursor:pointer;padding:7px 13px;font-size:13.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:rgba(201,183,122,.18);color:var(--text)}
+.seg button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:rgba(255,255,255,.03)}
+.search input{all:unset;flex:1;padding:8px 0;font-size:14px}
+.search kbd{font:500 11px var(--sans);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--muted)}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer}
+.mod{margin-top:26px}
+.mod>h2{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.mod>h2 .jp{font-size:18px;color:var(--igusa);font-weight:500}
+.mod>.desc{font-size:13.5px;color:var(--muted);margin-bottom:10px}
+.tech{border-top:1px solid var(--line);display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;padding:14px 0}
+.tech .tn{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.tech .tn .tk{font:500 13px var(--serif);color:var(--igusa)}
+.term{all:unset;cursor:help;border-bottom:1px dotted var(--igusa);font-weight:700}
+.term:hover{color:var(--igusa-strong)}
+.term:focus-visible{outline:2px solid var(--focus)}
+.tech .tn .term{font:700 19px/1.2 var(--serif);border-bottom-color:transparent}
+.tech .tn .term:hover{border-bottom-color:var(--igusa)}
+.ref{all:unset;cursor:pointer;font-size:12.5px;color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.ref:hover{color:var(--text)}
+.ref:focus-visible{outline:2px solid var(--focus)}
+.new{font-size:11.5px;padding:1px 7px;border-radius:20px;border:1px solid var(--igusa);color:var(--igusa-strong)}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:28px minmax(170px,230px) 1fr;gap:12px;align-items:center;padding:6px 8px;border-radius:9px}
+.row:hover{background:rgba(201,183,122,.06)}
+.row.done .atk{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--igusa)}
+.row input[type=checkbox]{width:17px;height:17px;accent-color:var(--igusa)}
+.atk{font-size:14.5px}
+.vids{display:flex;gap:6px;flex-wrap:wrap}
+.vb{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:5px 11px 5px 8px;border-radius:8px;border:1px solid var(--line);font-size:13px;background:rgba(255,255,255,.03)}
+.vb svg{width:14px;height:14px;fill:currentColor;color:var(--igusa)}
+.vb:hover{border-color:var(--igusa)}
+.vb.seen{color:var(--muted)}
+.vb.seen svg{opacity:.5}
+.vb.cur{background:var(--igusa);color:var(--panel-solid);border-color:var(--igusa)}
+.vb.cur svg{color:var(--panel-solid)}
+.vb:focus-visible{outline:2px solid var(--focus)}
+.free{font-size:14px;color:var(--muted);align-self:center}
+.empty{padding:30px 0;color:var(--muted)}
+
+/* técnicas: mapa */
+.matrix{overflow-x:auto;margin-top:18px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:700 13px var(--sans);color:var(--muted)}
+td.c{text-align:center}
+.dot{all:unset;cursor:pointer;display:inline-grid;place-items:center;min-width:30px;height:26px;border-radius:7px;font-size:12.5px;font-weight:700;color:#10131d}
+.dot:focus-visible{outline:2px solid var(--focus)}
+.dash{color:var(--muted);opacity:.4}
+
+/* glosario */
+.gtools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0 8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{all:unset;cursor:pointer;padding:5px 11px;border-radius:20px;border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--igusa);color:var(--text);background:rgba(201,183,122,.12)}
+.chip:focus-visible{outline:2px solid var(--focus)}
+.alpha{display:flex;gap:2px;flex-wrap:wrap;margin:6px 0 14px}
+.alpha a{font:700 14px var(--serif);text-decoration:none;padding:2px 7px;border-radius:5px;color:var(--muted)}
+.alpha a:hover{color:var(--text);background:rgba(201,183,122,.1)}
+.alpha span{font:700 14px var(--serif);padding:2px 7px;color:var(--muted);opacity:.3}
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.letter{grid-column:1/-1;font:800 22px var(--serif);color:var(--igusa);margin-top:10px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.entry{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:rgba(255,255,255,.025);display:flex;flex-direction:column;gap:4px}
+.entry.hl{border-color:var(--igusa);box-shadow:0 0 0 2px rgba(201,183,122,.35)}
+.entry .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.entry h3{font-size:20px}
+.entry .kj{font:500 22px var(--serif);color:var(--igusa-strong);white-space:nowrap}
+.entry .ph{font-size:13px;color:var(--muted)}
+.entry .def{font-size:14.5px;margin:4px 0 2px}
+.entry .lit{font-size:13px;color:var(--muted)}
+.entry .foot{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.tag{font-size:11.5px;padding:1px 8px;border-radius:20px;border:1px solid var(--line);color:var(--muted)}
+.where{all:unset;cursor:pointer;font-size:11.5px;padding:1px 8px;border-radius:20px;color:#10131d;font-weight:700}
+.where:focus-visible{outline:2px solid var(--focus)}
+.howto{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 26px;font-size:14px;color:var(--muted);margin-top:10px}
+.howto b{color:var(--text);font-weight:500}
+details.hw{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:10px 16px}
+details.hw summary{cursor:pointer;font-weight:500}
+
+/* popover glosario */
+#pop{position:fixed;z-index:20;max-width:340px;background:var(--panel-solid);border:1px solid var(--igusa);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);display:none}
+#pop.on{display:block}
+#pop h3{font-size:18px}
+#pop .kj{font:500 20px var(--serif);color:var(--igusa-strong)}
+#pop p{font-size:14px;margin:6px 0}
+#pop .ph{font-size:12.5px;color:var(--muted)}
+#pop button{all:unset;cursor:pointer;font-size:13px;color:var(--igusa-strong);text-decoration:underline}
+
+/* danes */
+.dans{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+.dan{display:grid;grid-template-columns:120px 1fr;gap:18px;border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:rgba(255,255,255,.025)}
+.dan .dk{font:800 34px/1 var(--serif);color:var(--igusa-strong)}
+.dan .dn{font-size:13px;color:var(--muted);margin-top:4px}
+.dan p{margin:0}
+.dan .orig{font-size:12.5px;color:var(--muted);margin-top:6px}
+
+/* práctica */
+.prog{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:18px 0 26px}
+.pg{border:1px solid var(--line);border-radius:12px;padding:14px}
+.pg .meter{height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin:8px 0 6px}
+.pg .meter i{display:block;height:100%}
+.pg .n{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.quiz{border:1px solid var(--line);border-radius:14px;padding:26px;background:rgba(255,255,255,.03);max-width:720px}
+.quiz .q{font:700 30px/1.25 var(--serif);margin:10px 0 6px}
+.quiz .qs{color:var(--muted);font-size:14px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{all:unset;cursor:pointer;padding:9px 16px;border-radius:10px;border:1px solid var(--igusa);font-size:14px;font-weight:500}
+.btn.pri{background:var(--igusa);color:var(--panel-solid)}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--focus)}
+.btn[disabled]{opacity:.4;cursor:default}
+
+/* dock de video */
+.dock{display:flex;flex-direction:column;padding:18px;overflow:auto}
+.dock h2{font-size:15px;font-family:var(--sans);font-weight:500;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.screen{aspect-ratio:16/9;border-radius:10px;background:#0c0f1a;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden;position:relative}
+.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.screen .ph{color:#b9bccb;font-size:13.5px;text-align:center;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.screen .ph .big{font:800 44px var(--serif);color:var(--igusa)}
+.vt{margin-top:14px}
+.vt .l1{font-size:12.5px;color:var(--muted)}
+.vt .l2{font:700 22px/1.2 var(--serif);margin:4px 0}
+.vt .l3{font-size:14.5px}
+.dock .btns{margin-top:14px}
+.queue{margin-top:18px;border-top:1px solid var(--line);padding-top:12px;font-size:13px;color:var(--muted)}
+.queue ol{margin:8px 0 0;padding-left:30px;max-height:240px;overflow:auto}
+.queue li{padding:2px 0}
+.queue li button{all:unset;cursor:pointer}
+.queue li button:hover{color:var(--text)}
+.queue li.cur{color:var(--igusa-strong);font-weight:700}
+.x{all:unset;cursor:pointer;font-size:20px;line-height:1;padding:2px 6px;border-radius:6px}
+.x:focus-visible{outline:2px solid var(--focus)}
+.kbdhint{font-size:12px;color:var(--muted);margin-top:10px}
+
+/* responsivo */
+@media (max-width:1320px){
+  .app{grid-template-columns:220px minmax(0,1fr)}
+  .dock{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:380px;max-height:calc(100% - 36px);z-index:10;display:none}
+  .app.showdock .dock{display:flex}
+  .cols{grid-template-columns:1fr 1fr}
+}
+@media (max-width:900px){
+  body{overflow:auto}
+  .app{display:block;height:auto;padding:10px}
+  .side{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;flex-direction:row;flex-wrap:wrap;align-items:center;padding:10px;margin-bottom:10px;gap:6px}
+  .brand{border:0;margin:0;padding:0 8px 0 4px}
+  .brand small{display:none}
+  .nav{flex-direction:row;flex-wrap:wrap}
+  .nav button .k{display:none}
+  .side .belts,.side .foot{display:none}
+  .main{overflow:visible}
+  .view{padding:20px 16px 40px}
+  .hero{grid-template-columns:1fr}
+  .hero .kanji{writing-mode:horizontal-tb;font-size:72px}
+  .hero h1{font-size:38px}
+  .ladder{grid-template-columns:repeat(3,1fr)}
+  .cols,.howto{grid-template-columns:1fr}
+  .tech{grid-template-columns:1fr}
+  .row{grid-template-columns:24px 1fr}
+  .row .vids{grid-column:2}
+  .prog{grid-template-columns:1fr 1fr}
+  .dock{left:10px;right:10px;width:auto}
+  .dan{grid-template-columns:1fr}
+  .tools{position:static;background:none}
+  .tools .search{flex-basis:100%}
+  .search kbd{display:none}
+}
+@media (prefers-reduced-motion: reduce){.grain{animation:none}.main{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true">
+  <canvas id="mat"></canvas>
+  <video id="bgVideo" muted loop playsinline></video>
+  <div class="grain"></div>
+</div>
+
+<div class="app nodock" id="app">
+  <aside class="side" aria-label="Navegación">
+    <a class="brand" href="#inicio" data-go="inicio">
+      <span class="mark" aria-hidden="true">合気</span>
+      <span><span class="name">Aiki wiki</span><small>Programa de exámenes y glosario</small></span>
+    </a>
+    <nav class="nav" id="nav">
+      <button data-go="inicio"><span class="k" aria-hidden="true">道</span>Inicio</button>
+      <button data-go="programa"><span class="k" aria-hidden="true">級</span>Programa por grado</button>
+      <button data-go="tecnicas"><span class="k" aria-hidden="true">技</span>Mapa de técnicas</button>
+      <button data-go="glosario"><span class="k" aria-hidden="true">語</span>Glosario</button>
+      <button data-go="danes"><span class="k" aria-hidden="true">段</span>Danes</button>
+      <button data-go="practica"><span class="k" aria-hidden="true">稽</span>Mi práctica</button>
+    </nav>
+    <div class="belts" id="sideBelts" aria-label="Ir a un grado"></div>
+    <div class="foot">
+      <p class="bgcap" id="bgcap" aria-live="polite">Fondo: <b>tenkan</b>, vista desde arriba</p>
+      <button class="tog" id="motionBtn" aria-pressed="false">⏸ Pausar el fondo</button>
+      <button class="tog" id="vidBtn">▶ Usar un video propio de fondo</button>
+      <input type="file" id="vidFile" accept="video/*" hidden>
+      <button class="tog" id="themeBtn">◐ Cambiar tema</button>
+    </div>
+  </aside>
+
+  <main class="main" id="main" tabindex="-1">
+    <!-- INICIO -->
+    <section class="view" id="v-inicio" aria-labelledby="h-inicio">
+      <div class="hero">
+        <div class="kanji" aria-hidden="true">合気道</div>
+        <div>
+          <h1 id="h-inicio">Aiki wiki</h1>
+          <p class="lead">Todo el programa de exámenes de kyu en un solo lugar: qué ataque, qué técnica y qué variante te piden en cada grado, con su video y un glosario para entender cada palabra.</p>
+        </div>
+      </div>
+      <h2 style="margin-bottom:6px">Elige tu grado</h2>
+      <p class="lead" style="font-size:15px">El camino va del 5.º kyu (cinturón amarillo) al 1.º kyu (marrón) y luego a los danes.</p>
+      <div class="ladder" id="ladder"></div>
+      <div class="cols">
+        <div><h3>Estudia por grado</h3><p>Cada grado se organiza por posición de trabajo (de pie, de rodillas o mixta), luego por técnica y ataque. Las etiquetas «nuevo» marcan lo que aparece por primera vez.</p></div>
+        <div><h3>Mira las variantes en fila</h3><p>Al abrir un video, el panel de la derecha arma la lista del grado completo. Con las flechas ← → pasas a la variante siguiente, como en un repaso previo al examen.</p></div>
+        <div><h3>Entiende cada palabra</h3><p>Toca cualquier nombre subrayado para ver su definición, escritura japonesa y pronunciación aproximada. El glosario completo reúne más de 90 términos.</p></div>
+      </div>
+      <p class="note">Esta wiki organiza el programa de exámenes de Aikido Aikikai Argentina (<a href="https://www.aikidoaikikai.org.ar/programa" target="_blank" rel="noopener">aikidoaikikai.org.ar/programa</a>) y enlaza los videos de YouTube que el propio programa indica. Es un material de estudio y difusión: no reemplaza la práctica en el tatami ni la guía de tu sensei, que es quien define los requisitos de tu examen.</p>
+    </section>
+
+    <!-- PROGRAMA -->
+    <section class="view" id="v-programa" aria-labelledby="h-prog">
+      <div id="gradeHead"></div>
+      <div class="tools" role="toolbar" aria-label="Filtros del grado">
+        <div class="seg" id="gradeSeg" role="group" aria-label="Grado"></div>
+        <div class="seg" id="modSeg" role="group" aria-label="Posición"></div>
+        <label class="search"><span aria-hidden="true">⌕</span><span class="sr">Buscar en el grado</span><input id="q" placeholder="Filtra por ataque o técnica (ej.: yokomen, kote)" autocomplete="off"><kbd>/</kbd></label>
+        <label class="chk"><input type="checkbox" id="onlyNew"> Solo lo nuevo</label>
+        <button class="btn" id="playAll">▶ Repasar el grado</button>
+      </div>
+      <div id="gradeBody"></div>
+    </section>
+
+    <!-- TECNICAS -->
+    <section class="view" id="v-tecnicas" aria-labelledby="h-tec">
+      <h1 id="h-tec">Mapa de técnicas</h1>
+      <p class="lead" style="margin-top:8px">Cómo reaparece cada técnica a lo largo de los grados. El número indica cuántos ataques distintos se piden; toca una celda para ir a esa técnica dentro del grado.</p>
+      <div class="seg" id="mapSeg" role="group" aria-label="Posición" style="margin-top:14px;width:max-content"></div>
+      <div class="matrix"><table id="mtx"></table></div>
+    </section>
+
+    <!-- GLOSARIO -->
+    <section class="view" id="v-glosario" aria-labelledby="h-glo">
+      <h1 id="h-glo">Glosario</h1>
+      <p class="lead" style="margin-top:8px">Las palabras japonesas que vas a escuchar en el dojo y leer en el programa, con su escritura, su sentido literal y una pronunciación aproximada para hablantes del Río de la Plata.</p>
+      <details class="hw">
+        <summary>Cómo leer este glosario</summary>
+        <div class="howto">
+          <p><b>Grafía.</b> Usamos la forma del programa como entrada principal y mostramos la romanización Hepburn con vocales largas (ō, ū). Si el programa usa otra grafía (Nikkyo, Jiju waza, Zagi) aparece como variante.</p>
+          <p><b>Pronunciación.</b> Es aproximada. La «j» suena como la «y» rioplatense (jiyū → «yiyú»), la «g» es siempre suave como en «gato» (nage → «naguê»), la «u» final casi no suena (tsuki → «tski») y «sh» es como en inglés.</p>
+          <p><b>Composición.</b> Muchos nombres se arman por piezas: ataque + técnica + variante. «Shomen uchi ikkyo omote» se lee: golpe frontal, primera enseñanza, hacia el frente.</p>
+          <p><b>Dónde aparece.</b> Las etiquetas de color se calculan del programa: indican en qué grados aparece cada ataque o técnica y te llevan ahí.</p>
+          <p><b>Grados y técnicas.</b> Ojo con los homónimos: Ikkyō (一教, primera técnica) no es Ikkyū (一級, 1.er kyu). Cambia solo la última vocal.</p>
+          <p><b>Límites.</b> Las traducciones literales ayudan a recordar, pero el sentido técnico se aprende en el tatami. Cada escuela puede nombrar distinto algunas variantes.</p>
+        </div>
+      </details>
+      <div class="gtools">
+        <label class="search" style="max-width:420px"><span aria-hidden="true">⌕</span><span class="sr">Buscar en el glosario</span><input id="gq" placeholder="Busca en japonés o en castellano (ej.: muñeca, hombro)" autocomplete="off"></label>
+        <div class="chips" id="gcats" role="group" aria-label="Categoría"></div>
+      </div>
+      <nav class="alpha" id="alpha" aria-label="Índice alfabético"></nav>
+      <div class="gl" id="gl"></div>
+    </section>
+
+    <!-- DANES -->
+    <section class="view" id="v-danes" aria-labelledby="h-dan">
+      <h1 id="h-dan">Danes</h1>
+      <p class="lead" style="margin-top:8px">Después del 1.º kyu, el programa ya no pide una lista cerrada: pide dominar todo lo anterior en cualquier posición y ante cualquier ataque, y suma armas y varios atacantes.</p>
+      <div class="dans" id="dans"></div>
+    </section>
+
+    <!-- PRACTICA -->
+    <section class="view" id="v-practica" aria-labelledby="h-pra">
+      <h1 id="h-pra">Mi práctica</h1>
+      <p class="lead" style="margin-top:8px">Marca los ataques que ya practicaste en cada grado y usa el repaso al azar para simular el momento en que el examinador pide una técnica. Tu avance queda guardado solo en este navegador.</p>
+      <div class="prog" id="prog"></div>
+      <div class="quiz" id="quiz"></div>
+      <div class="btns"><button class="btn" id="resetBtn">Borrar mi avance</button></div>
+    </section>
+  </main>
+
+  <aside class="dock" id="dock" aria-label="Video">
+    <h2><span>Video</span><button class="x" id="closeDock" aria-label="Cerrar video">×</button></h2>
+    <div class="screen" id="screen"></div>
+    <div class="vt" id="vt"></div>
+    <div class="btns" id="vbtns"></div>
+    <div class="queue" id="queue"></div>
+  </aside>
+</div>
+
+<div id="pop" role="dialog" aria-live="polite"></div>
+
+<script>
+/* =============================================================
+   DATOS: programa tal como figura en el PDF (ataque, técnica,
+   variantes y enlaces de video). Grafías normalizadas; los
+   originales se conservan en el glosario como variantes.
+   ============================================================= */
+const V=(l,id)=>[l,id];
+const GRADES=[
+{id:'5',kyu:'5.º kyu',jp:'五級',read:'Gokyū',belt:'Amarillo',color:'var(--b5)',hex:'#E8C22B',
+ sections:[
+ {m:'tachi',items:[
+  {t:'Ikkyo',ref:'3-117og5KN0',rows:[
+    {a:'Ai hanmi katate dori',v:[V('Omote','kAFvXfgS55w'),V('Ura','L4OQJrsOwew')]},
+    {a:'Shomen uchi',v:[V('Omote','vF35RXH9JbE'),V('Ura','ZC1fMb5JFT8')]}]},
+  {t:'Shiho nage',ref:'zJn9CI-6KrU',rows:[
+    {a:'Ai hanmi katate dori',v:[V('Omote','KA8hm4vaGqM'),V('Ura','axc_Y3B9gcw')]},
+    {a:'Katate dori',v:[V('Omote (parado)','Sb9Jwdf55kw'),V('Ura (parado)','g-YQO6HdPPw')]},
+    {a:'Katate dori',v:[V('Omote (en acción)','M3AvdNsjMRY'),V('Ura (en acción)','iXPrXTsrd6M')]}]},
+  {t:'Irimi nage',ref:'z74nXcAJEv0',rows:[
+    {a:'Ai hanmi katate dori',v:[V('Video','ru4b57hio5A')]},
+    {a:'Shomen uchi',v:[V('Video','H0tWwwF3ZGQ')]}]},
+  {t:'Tenchi nage',ref:'tp2Peirz_5Y',rows:[
+    {a:'Katate dori',v:[V('Omote','oKs9pW2guS4'),V('Ura (con tenkan)','r8UjH5yERjA')]}]},
+  {t:'Jiyu waza',free:'Técnica libre.'}]},
+ {m:'suwari',items:[
+  {t:'Ikkyo',ref:'KTmrh2tJ3iU',rows:[{a:'Shomen uchi',v:[V('Omote','F9SvVogpOiU'),V('Ura','bLlKp0boyG0')]}]}]}
+ ]},
+{id:'4',kyu:'4.º kyu',jp:'四級',read:'Yonkyū',belt:'Naranja',color:'var(--b4)',hex:'#E8862A',
+ sections:[
+ {m:'tachi',items:[
+  {t:'Ikkyo',ref:'3-117og5KN0',rows:[
+    {a:'Katate dori',v:[V('Omote','bAgJ4BMyQzs'),V('Ura','6mpU9A6w5rc')]},
+    {a:'Kata dori',v:[V('Omote','Ljzt_7JQMYs'),V('Ura','BMRHRu579EI')]}]},
+  {t:'Nikyo',rows:[
+    {a:'Kata dori',v:[V('Ura','6tCkPiYcLbo')]},
+    {a:'Ai hanmi katate dori',v:[V('Ura (forma 1)','hP9Yfp9q6-8')]}]},
+  {t:'Sankyo',rows:[
+    {a:'Ushiro ryote dori',v:[V('Omote','g5Un1vB1Nvk'),V('Ura','DuP-vXqR34k')]},
+    {a:'Ai hanmi katate dori',v:[V('Omote','iu3Dq5Hru-k')]}]},
+  {t:'Kote gaeshi',rows:[
+    {a:'Ai hanmi katate dori',v:[V('Video','yGbedbZdGMc')]},
+    {a:'Shomen uchi',v:[V('Video','HlXw2FR5x-I')]},
+    {a:'Katate dori',v:[V('Video','4vOKBhJgHls')]}]},
+  {t:'Shiho nage',rows:[{a:'Yokomen uchi',v:[V('Omote','d0mPhTULCYo'),V('Ura','FST_VQarY3Q')]}]},
+  {t:'Irimi nage',rows:[{a:'Katate dori',v:[V('Forma 1','vyaDp6BXiGg'),V('Forma 2 (tenkan 180°)','wRXcA2oNtwU'),V('Forma 3 (tenkan 360°)','rXtRnhgenUg')]}]},
+  {t:'Tenchi nage',rows:[{a:'Ryote dori',v:[V('Omote','6HQD1d4BHCo'),V('Ura','OGxdn6V16do')]}]},
+  {t:'Uchi kaiten nage',rows:[{a:'Katate dori',v:[V('Omote','VnvDQ9ZV3Pg'),V('Ura','qktlyo8kvvU')]}]},
+  {t:'Soto kaiten nage',rows:[{a:'Katate dori',v:[V('Omote','_4sXVjQcYBE'),V('Ura','JNIUGyj0kHk')]}]},
+  {t:'Ude kime nage',rows:[
+    {a:'Ai hanmi katate dori',v:[V('Video','VB8c77hnLu4')]},
+    {a:'Katate dori',v:[V('Ura','jLuvCxbCBuc')]}]},
+  {t:'Sokumen irimi nage',rows:[{a:'Katate dori',v:[V('Video','taEXMmy_0os')]}]},
+  {t:'Koshi nage',rows:[{a:'Katate dori',v:[V('Video','zTaANJPsGR0')]}]},
+  {t:'Jiyu waza',free:'Técnica libre.'}]},
+ {m:'suwari',items:[
+  {t:'Nikyo',rows:[{a:'Shomen uchi',v:[V('Omote','K1Jz7h0dcJ8'),V('Ura','l0yyFCvMtTo')]}]},
+  {t:'Irimi nage',rows:[{a:'Shomen uchi',v:[V('Video','V7qjcoXo_Vg')]}]}]}
+ ]},
+{id:'3',kyu:'3.º kyu',jp:'三級',read:'Sankyū',belt:'Verde',color:'var(--b3)',hex:'#3FA35A',
+ sections:[
+ {m:'tachi',items:[
+  {t:'Ikkyo',ref:'3-117og5KN0',rows:[
+    {a:'Ryote dori',v:[V('Omote (interior)','3PxV_rVTHj8'),V('Ura (salida lateral)','spMQdaUIit0')]},
+    {a:'Yokomen uchi',v:[V('Omote','SxJkcfTGt8g'),V('Ura','6TugsLT6Jmo')]},
+    {a:'Ushiro ryote dori',v:[V('Omote','-tzTawJnYWc'),V('Ura','g3MhUGYDXFk')]}]},
+  {t:'Nikyo',rows:[
+    {a:'Katate ryote dori',v:[V('Forma 1','rR4t9x5kEks'),V('Forma 2','WbJjAOg56S8')]},
+    {a:'Shomen uchi',v:[V('Omote','ZhB65kAXgsg'),V('Ura','yqMWWSxmcQE')]},
+    {a:'Yokomen uchi',v:[V('Ura','Of6MJtJEd2I')]},
+    {a:'Ushiro ryote dori',v:[V('Ura','WuILm5dDhEw')]}]},
+  {t:'Sankyo',rows:[
+    {a:'Shomen uchi',v:[V('Omote','FeJNM6uDo1w'),V('Ura','sw2O_4ygDmY')]},
+    {a:'Yokomen uchi',v:[V('Omote','iqD0iqtuPBw'),V('Ura','tMR_QjDCOG8')]}]},
+  {t:'Yonkyo',rows:[
+    {a:'Shomen uchi',v:[V('Omote','AHnatB7xIgc'),V('Ura','-BT2cCNme7Q')]},
+    {a:'Yokomen uchi',v:[V('Omote','EH6_dav-fws'),V('Ura','S72XmL3eRYY')]}]},
+  {t:'Kote gaeshi',rows:[
+    {a:'Ushiro ryote dori',v:[V('Video','GmSXWSZ4m5o')]},
+    {a:'Katate ryote dori',v:[V('Exterior','-cFetqgVivs')]},
+    {a:'Yokomen uchi',v:[V('Interior','Y5FNL3I-Lw4'),V('Exterior','uVpxd6Y4IDE')]}]},
+  {t:'Shiho nage',rows:[{a:'Ushiro ryote dori',v:[V('Video','MA8Idc5-obc')]}]},
+  {t:'Irimi nage',rows:[{a:'Ushiro ryote dori',v:[V('Video','QObYDjAbJS8')]}]},
+  {t:'Ude kime nage',rows:[{a:'Katate ryote dori',v:[V('Video','z5A-Uadm7EQ')]}]},
+  {t:'Koshi nage',rows:[{a:'Yokomen uchi',v:[V('Video','YWCPRl2dvzI')]}]},
+  {t:'Jiyu waza',free:'Técnica libre: solo kokyu nage.'}]},
+ {m:'suwari',items:[
+  {t:'Ikkyo',ref:'KTmrh2tJ3iU',rows:[{a:'Yokomen uchi',v:[V('Omote','Iaa5jrIVBBc'),V('Ura','VEEbSzPsY1w')]}]},
+  {t:'Sankyo',rows:[{a:'Shomen uchi',v:[V('Omote','LQWoCG6wgDo'),V('Ura','SEtRIiiLdgc')]}]},
+  {t:'Yonkyo',rows:[{a:'Shomen uchi',v:[V('Omote','r2lrbV3rtcM'),V('Ura','Yk3a4secdbA')]}]},
+  {t:'Kote gaeshi',rows:[
+    {a:'Shomen uchi',v:[V('Video','Pn0TKIo_Lag')]},
+    {a:'Yokomen uchi',v:[V('Video','HRaIr6MRAao')]}]}]},
+ {m:'hanmi',items:[
+  {t:'Shiho nage',rows:[{a:'Katate dori',v:[V('Omote','xVJKAXalgjo'),V('Ura','W6j9Lqcx8ZQ')]}]},
+  {t:'Irimi nage',rows:[{a:'Shomen uchi',v:[V('Video','4uVLQyTwZfQ')]}]},
+  {t:'Ude garami',rows:[{a:'Katate dori',v:[V('Uchi kaiten','uWFgXVFJScM')]}]}]}
+ ]},
+{id:'2',kyu:'2.º kyu',jp:'二級',read:'Nikyū',belt:'Azul',color:'var(--b2)',hex:'#2F8FD8',
+ sections:[
+ {m:'tachi',items:[
+  {t:'Ikkyo',ref:'3-117og5KN0',rows:[
+    {a:'Kata dori men uchi',v:[V('Omote','t56zwE8bRYo'),V('Ura','f_2eMvCLsgE')]},
+    {a:'Chudan tsuki',v:[V('Omote','bIa6UPR5WKI'),V('Ura','1QI5h-Xzyu4')]}]},
+  {t:'Nikyo',rows:[
+    {a:'Kata dori men uchi',v:[V('Ura','nWlcRYoVXrg')]},
+    {a:'Ushiro ryo kata dori',v:[V('Ura','FEQrMaEcudw')]}]},
+  {t:'Sankyo',rows:[
+    {a:'Katate dori',v:[V('Omote','N2xso3F5cOI'),V('Ura','oeEo3ZILn3Y')]},
+    {a:'Kata dori men uchi',v:[V('Video','C730De2BgBg'),V('Ura','R0xUNatk9ZM')]},
+    {a:'Ushiro ryo kata dori',v:[V('Omote','QycQgTmOZhk'),V('Ura','WpSNdkEmNqU')]}]},
+  {t:'Yonkyo',rows:[{a:'Katate dori',v:[V('Omote','OZsdnzgug0A'),V('Ura','vsIzbgPhDAU')]}]},
+  {t:'Gokyo',rows:[{a:'Yokomen uchi',v:[V('Kiri gaeshi','6GnBaklsHmE')]}]},
+  {t:'Kote gaeshi',rows:[
+    {a:'Ryote dori',v:[V('Video','K5CIDRd2XuY')]},
+    {a:'Kata dori men uchi',v:[V('Video','TiEDm48m0Mo')]}]},
+  {t:'Shiho nage',rows:[
+    {a:'Kata dori men uchi',v:[V('Video','f8prg333myY')]},
+    {a:'Shomen uchi',v:[V('Omote','vGyqzH4hw9E')]}]},
+  {t:'Irimi nage',rows:[
+    {a:'Ryote dori',v:[V('Video','FqUw1UHvXqw')]},
+    {a:'Chudan tsuki',v:[V('Video','00Zubv24NAs')]},
+    {a:'Kata dori men uchi',v:[V('Video','K3FSywboKqE')]}]},
+  {t:'Kaiten nage',rows:[{a:'Shomen uchi',v:[V('Soto kaiten (omote)','Xy_42B1gGF4'),V('Uchi kaiten (omote)','Qh9Z8qrpcWU')]}]},
+  {t:'Hiji kime osae',rows:[{a:'Jodan tsuki',v:[V('Video','5Vuo-ZmTVjg')]}]},
+  {t:'Sumi otoshi',rows:[{a:'Katate dori',v:[V('1.ª forma','76U1pnd03YE')]}]},
+  {t:'Aiki otoshi',rows:[{a:'Ushiro ryo kata dori',v:[V('Video','CL_i-_Kzgts')]}]},
+  {t:'Koshi nage',rows:[{a:'Ai hanmi katate dori',v:[V('1.ª forma','VoX5I0LFYSs'),V('3.ª forma','7EJgvcFCvkk')]}]},
+  {t:'Juji garami',rows:[{a:'Ushiro ryote dori',v:[V('Video','eh7ghBC7aA4')]}]},
+  {t:'Naname kokyu nage',sub:'(sokumen irimi nage)',rows:[{a:'Ushiro ryo kata dori',v:[V('Video','vKQllnqCczs')]}]},
+  {t:'Jiyu waza',free:'Técnica libre: solo kokyu nage.'}]},
+ {m:'suwari',items:[
+  {t:'Nikyo',ref:'KTmrh2tJ3iU',rows:[{a:'Yokomen uchi',v:[V('Omote','dInoBqHeJ0E'),V('Ura','-N-pv17r840')]}]},
+  {t:'Sankyo',ref:'KTmrh2tJ3iU',rows:[{a:'Yokomen uchi',v:[V('Ura (kiri gaeshi)','bAoiznsWUSw')]}]},
+  {t:'Irimi nage',rows:[{a:'Yokomen uchi',v:[V('Video','FLZL9Ny17Tc')]}]}]},
+ {m:'hanmi',items:[
+  {t:'Ikkyo',ref:'KTmrh2tJ3iU',rows:[{a:'Katate dori',v:[V('Omote','mVUGGcdPiL0'),V('Ura','4MSqOf0yj_c')]}]},
+  {t:'Shiho nage',rows:[{a:'Ryote dori',v:[V('Omote','Ieuuo7ruAxk'),V('Ura','rxFT6Z1eyIo')]}]},
+  {t:'Kote gaeshi',rows:[{a:'Shomen uchi',v:[V('Video','rz0krM_G2bY')]}]}]}
+ ]},
+{id:'1',kyu:'1.º kyu',jp:'一級',read:'Ikkyū',belt:'Marrón',color:'var(--b1)',hex:'#B0673A',
+ sections:[
+ {m:'tachi',items:[
+  {t:'Ikkyo',ref:'3-117og5KN0',rows:[
+    {a:'Ushiro eri dori',v:[V('Omote','ux2y7QLVazA')]},
+    {a:'Jodan tsuki',v:[V('Omote','n1w1LvO2tsM')]}]},
+  {t:'Nikyo',rows:[{a:'Jodan tsuki',v:[V('Ura','O4Va7NySih8')]}]},
+  {t:'Sankyo',rows:[{a:'Jodan tsuki',v:[V('Ura (en hombro)','BaZEQT0iE60')]}]},
+  {t:'Gokyo',rows:[{a:'Shomen uchi',v:[V('Video','nHclbr2Pi7k')]}]},
+  {t:'Kote gaeshi',rows:[{a:'Chudan tsuki',v:[V('Video','dyqMt0LFUeY')]}]},
+  {t:'Shiho nage',rows:[
+    {a:'Muna dori',v:[V('Video','_hvA2cA1WtA')]},
+    {a:'Ushiro eri dori',v:[V('Video','6IMa5s1n-KA')]},
+    {a:'Ushiro katate dori kubi shime',v:[V('Video','tkPg27d12qE')]}]},
+  {t:'Irimi nage',rows:[{a:'Jodan tsuki',v:[V('Video','6Y57G8Vnffo')]}]},
+  {t:'Kaiten nage',rows:[
+    {a:'Jodan tsuki',v:[V('Uchi kaiten (omote)','EphjdG106zY'),V('Soto kaiten (omote)','QJbhFVHVpko')]},
+    {a:'Chudan tsuki',v:[V('Uchi kaiten (omote)','fr7qDR9JXZA'),V('Soto kaiten (omote)','ntM7jFOw0AU')]}]},
+  {t:'Koshi nage',rows:[{a:'Ushiro katate dori kubi shime',v:[V('Video','yHFH0KrAlAU')]}]},
+  {t:'Juji garami',rows:[{a:'Katate ryote dori',v:[V('Video','IgZ85z20Q_Y')]}]},
+  {t:'Jiyu waza',free:'Técnica libre: solo kokyu nage.'}]},
+ {m:'suwari',items:[
+  {t:'Ikkyo a gokyo',ref:'KTmrh2tJ3iU',rows:[
+    {a:'Shomen uchi',v:[V('Video','oIC7pH-P4uo')]},
+    {a:'Yokomen uchi',v:[V('Video','Su-USBYnf3M')]}]},
+  {t:'Irimi nage',rows:[
+    {a:'Shomen uchi',v:[V('Video','V7qjcoXo_Vg')]},
+    {a:'Yokomen uchi',v:[V('Video','FLZL9Ny17Tc')]}]},
+  {t:'Kote gaeshi',rows:[
+    {a:'Shomen uchi',v:[V('Video','Pn0TKIo_Lag')]},
+    {a:'Yokomen uchi',v:[V('Video','HRaIr6MRAao')]}]}]},
+ {m:'hanmi',items:[
+  {t:'Ikkyo',ref:'KTmrh2tJ3iU',rows:[{a:'Shomen uchi',v:[V('Omote','ZyorwJxGTS4'),V('Ura','EtDBeJTnYl4')]}]},
+  {t:'Nikyo',rows:[
+    {a:'Shomen uchi',v:[V('Ura','Bjbbr2DsBVo')]},
+    {a:'Katate dori',v:[V('Ura','3ZAxXbh2fRM')]}]},
+  {t:'Shiho nage',rows:[{a:'Katate dori',v:[V('Omote','xVJKAXalgjo'),V('Ura','W6j9Lqcx8ZQ')]}]},
+  {t:'Kote gaeshi',rows:[{a:'Katate dori',v:[V('Video','ZPovY3bqUss')]}]}]}
+ ]}
+];
+const MODS={
+  tachi:{n:'Tachi waza',jp:'立ち技',d:'Ambos de pie.'},
+  suwari:{n:'Suwari waza',jp:'座り技',d:'Ambos de rodillas, desplazándose en shikko.'},
+  hanmi:{n:'Hanmi handachi waza',jp:'半身半立ち技',d:'Quien ejecuta está de rodillas y quien ataca, de pie.'}
+};
+const DANS=[
+ {k:'初段',n:'1.º dan',r:'Shodan',t:'Técnicas a mano vacía en las tres posiciones —suwari waza, hanmi handachi waza y tachi waza— ante yokomen uchi, shomen uchi, tsuki y todas las formas de agarre (hombros, codo, cuello, muñecas), incluidos los ataques por detrás.',o:'En el programa: «zagi (suwari waza), hami-handachi waza».'},
+ {k:'二段',n:'2.º dan',r:'Nidan',t:'Todo lo anterior, más tanto dori (defensa ante cuchillo) y futari gake (dos atacantes).',o:'En el programa: «Futarigake (con 2 ukes)».'},
+ {k:'三段',n:'3.º dan',r:'Sandan',t:'Todo lo anterior, más tachi dori (defensa ante espada), jo dori (defensa ante bastón) y taninzu gake (varios atacantes).',o:'En el programa: «Taninzugake (más de 3 ukes)».'},
+ {k:'四段',n:'4.º dan',r:'Yondan',t:'Jiyu waza de todo lo anterior, más un breve ensayo escrito sobre Aikido.',o:'En el programa: «Yiyu waza».'}
+];
+
+/* =============================================================
+   GLOSARIO. Campos: t término (forma del programa), h Hepburn,
+   k kanji/kana, p pronunciación aproximada, l sentido literal,
+   d definición, c categoría, alt grafías alternativas.
+   ============================================================= */
+const CATS={ata:'Ataques',tec:'Técnicas',pos:'Posiciones y modalidades',mov:'Movimiento y conceptos',dojo:'Dojo y etiqueta',gra:'Grados',arm:'Armas'};
+const GL=[
+// ataques
+{t:'Katate dori',h:'Katate-dori',k:'片手取り',p:'katate dori',l:'agarrar una mano',d:'Uke toma con una mano una muñeca de tori. Sin otra aclaración suele entenderse en gyaku hanmi (guardias opuestas): mano izquierda de uke a la derecha de tori, o viceversa.',c:'ata'},
+{t:'Ai hanmi katate dori',h:'Ai-hanmi katate-dori',k:'相半身片手取り',p:'ái janmi katate dori',l:'agarre de una mano en guardia igual',d:'Con ambos en la misma guardia, uke toma con su mano derecha la muñeca derecha de tori (o izquierda con izquierda), así que el agarre queda cruzado. Es el agarre con el que empieza el programa de 5.º kyu.',c:'ata'},
+{t:'Ryote dori',h:'Ryōte-dori',k:'両手取り',p:'riote dori',l:'agarrar ambas manos',d:'Uke toma las dos muñecas de tori, una con cada mano.',c:'ata'},
+{t:'Katate ryote dori',h:'Katate ryōte-dori',k:'片手両手取り',p:'katate riote dori',l:'una mano tomada con las dos',d:'Uke toma un antebrazo de tori con ambas manos. También se lo llama morote dori.',c:'ata',alt:['Morote dori']},
+{t:'Kata dori',h:'Kata-dori',k:'肩取り',p:'kata dori',l:'agarrar el hombro',d:'Uke toma la manga o la tela del keikogi a la altura del hombro de tori.',c:'ata'},
+{t:'Kata dori men uchi',h:'Kata-dori men-uchi',k:'肩取り面打ち',p:'kata dori men uchi',l:'agarre de hombro y golpe a la cabeza',d:'Uke toma el hombro con una mano y enseguida golpea a la cabeza con la otra. Tori debe resolver dos ataques encadenados.',c:'ata'},
+{t:'Shomen uchi',h:'Shōmen-uchi',k:'正面打ち',p:'shómen uchi',l:'golpe al frente',d:'Golpe vertical descendente con el canto de la mano (tegatana) al centro de la frente, como un corte de espada de arriba hacia abajo.',c:'ata'},
+{t:'Yokomen uchi',h:'Yokomen-uchi',k:'横面打ち',p:'iokómen uchi',l:'golpe al costado de la cabeza',d:'Golpe diagonal con tegatana a la sien o al costado del cuello, como un corte de espada en diagonal.',c:'ata'},
+{t:'Men uchi',h:'Men-uchi',k:'面打ち',p:'men uchi',l:'golpe a la cabeza',d:'Golpe a la cabeza en general. Aparece combinado en kata dori men uchi.',c:'ata'},
+{t:'Tsuki',h:'Tsuki',k:'突き',p:'tski',l:'estocada',d:'Puñetazo o estocada directa. Según la altura se precisa como chudan (medio) o jodan (alto).',c:'ata'},
+{t:'Chudan tsuki',h:'Chūdan-tsuki',k:'中段突き',p:'chúdan tski',l:'estocada al nivel medio',d:'Golpe directo al abdomen o al plexo.',c:'ata'},
+{t:'Jodan tsuki',h:'Jōdan-tsuki',k:'上段突き',p:'yódan tski',l:'estocada al nivel alto',d:'Golpe directo a la cara.',c:'ata'},
+{t:'Ushiro ryote dori',h:'Ushiro ryōte-dori',k:'後ろ両手取り',p:'ushiro riote dori',l:'agarrar ambas manos desde atrás',d:'Uke pasa por detrás de tori y le toma las dos muñecas. En otros programas se llama ushiro ryotekubi dori o ushiro tekubi dori.',c:'ata',alt:['Ushiro ryotekubi dori','Ushiro tekubi dori']},
+{t:'Ushiro ryo kata dori',h:'Ushiro ryōkata-dori',k:'後ろ両肩取り',p:'ushiro rio kata dori',l:'agarrar ambos hombros desde atrás',d:'Uke toma los dos hombros de tori desde atrás.',c:'ata'},
+{t:'Ushiro eri dori',h:'Ushiro eri-dori',k:'後ろ襟取り',p:'ushiro eri dori',l:'agarrar el cuello del keikogi desde atrás',d:'Uke toma desde atrás la solapa o el cuello del keikogi, tirando hacia abajo.',c:'ata'},
+{t:'Ushiro katate dori kubi shime',h:'Ushiro katate-dori kubi-shime',k:'後ろ片手取り首絞め',p:'ushiro katate dori kubi shime',l:'agarre de una mano y estrangulación desde atrás',d:'Desde atrás, uke toma una muñeca de tori con una mano y le rodea el cuello con el otro brazo.',c:'ata',alt:['Ushiro kubishime']},
+{t:'Muna dori',h:'Muna-dori',k:'胸取り',p:'muna dori',l:'agarrar el pecho',d:'Uke toma de frente las solapas del keikogi a la altura del pecho.',c:'ata'},
+// técnicas
+{t:'Ikkyo',h:'Ikkyō',k:'一教',p:'ikió',l:'primera enseñanza',d:'Control del brazo de uke llevando el codo hacia abajo hasta inmovilizarlo boca abajo. Es la base de las técnicas de inmovilización y aparece en todos los grados.',c:'tec',alt:['Ude osae']},
+{t:'Nikyo',h:'Nikyō',k:'二教',p:'nikió',l:'segunda enseñanza',d:'Inmovilización que flexiona y rota la muñeca de uke hacia su interior, con presión hacia su centro. Se trabaja casi siempre en ura en los primeros grados.',c:'tec',alt:['Nikkyo','Kote mawashi']},
+{t:'Sankyo',h:'Sankyō',k:'三教',p:'sankió',l:'tercera enseñanza',d:'Control por torsión de la muñeca y el antebrazo en espiral, que eleva a uke en puntas de pie antes de llevarlo al suelo.',c:'tec',alt:['Kote hineri']},
+{t:'Yonkyo',h:'Yonkyō',k:'四教',p:'ionkió',l:'cuarta enseñanza',d:'Control del antebrazo de uke aplicando presión con la base del índice sobre un punto sensible de la cara interna o externa de la muñeca.',c:'tec',alt:['Tekubi osae']},
+{t:'Gokyo',h:'Gokyō',k:'五教',p:'gokió',l:'quinta enseñanza',d:'Control del brazo parecido a ikkyo, con el agarre invertido. Se usa sobre todo ante ataques con arma, como un cuchillo, para mantener la mano de uke lejos.',c:'tec',alt:['Ude nobashi']},
+{t:'Ikkyo a gokyo',h:'Ikkyō – gokyō',k:'一教〜五教',p:'ikió a gokió',l:'de la primera a la quinta enseñanza',d:'En 1.º kyu el examinador puede pedir cualquiera de las cinco inmovilizaciones ante el mismo ataque, una tras otra.',c:'tec'},
+{t:'Shiho nage',h:'Shihō-nage',k:'四方投げ',p:'shijó naguê',l:'proyección en las cuatro direcciones',d:'Tori toma la muñeca de uke, pasa por debajo de su brazo y lo proyecta hacia atrás doblándole el brazo sobre el hombro, como un corte de espada. Se puede ejecutar hacia cualquier dirección.',c:'tec'},
+{t:'Irimi nage',h:'Irimi-nage',k:'入身投げ',p:'írimi naguê',l:'proyección entrando',d:'Tori entra al costado o a la espalda de uke, lo hace girar alrededor de su propio centro y lo proyecta pasando el brazo por delante de su cuello. En el programa aparece en varias formas (con tenkan de 180° o 360°).',c:'tec'},
+{t:'Tenchi nage',h:'Tenchi-nage',k:'天地投げ',p:'ténchi naguê',l:'proyección cielo y tierra',d:'Con las dos manos tomadas, tori eleva una hacia el cielo y baja la otra hacia la tierra mientras entra, desequilibrando a uke hacia atrás.',c:'tec'},
+{t:'Kote gaeshi',h:'Kote-gaeshi',k:'小手返し',p:'kote gaeshi',l:'giro de la muñeca',d:'Tori toma la mano de uke y la gira hacia afuera doblando la muñeca, lo que proyecta a uke de espaldas. Suele terminar con una inmovilización boca abajo.',c:'tec'},
+{t:'Kaiten nage',h:'Kaiten-nage',k:'回転投げ',p:'káiten naguê',l:'proyección en rueda',d:'Tori baja la cabeza de uke y le lleva el brazo en un gran arco hacia adelante, haciéndolo rodar como una rueda. Tiene dos formas: uchi y soto.',c:'tec'},
+{t:'Uchi kaiten nage',h:'Uchi kaiten-nage',k:'内回転投げ',p:'uchi káiten naguê',l:'proyección en rueda por dentro',d:'Forma de kaiten nage en la que tori pasa por debajo del brazo de uke, entrando por su lado interno.',c:'tec'},
+{t:'Soto kaiten nage',h:'Soto kaiten-nage',k:'外回転投げ',p:'soto káiten naguê',l:'proyección en rueda por fuera',d:'Forma de kaiten nage en la que tori se mueve por el exterior de uke, sin pasar bajo su brazo.',c:'tec'},
+{t:'Ude kime nage',h:'Ude-kime-nage',k:'腕極め投げ',p:'ude kime naguê',l:'proyección controlando el brazo',d:'Tori extiende el brazo de uke y lo controla a la altura del codo con su propio brazo mientras avanza, proyectándolo hacia adelante.',c:'tec'},
+{t:'Sokumen irimi nage',h:'Sokumen irimi-nage',k:'側面入身投げ',p:'sokúmen írimi naguê',l:'proyección entrando por el costado',d:'Tori entra al costado de uke y lo proyecta hacia atrás extendiendo el brazo en diagonal por delante de su pecho. El programa la identifica también con naname kokyu nage.',c:'tec'},
+{t:'Naname kokyu nage',h:'Naname kokyū-nage',k:'斜め呼吸投げ',p:'naname kokiú naguê',l:'proyección de respiración en diagonal',d:'Proyección en diagonal, sin tomar a uke, usando el movimiento y la extensión del cuerpo. El programa la equipara con sokumen irimi nage.',c:'tec'},
+{t:'Koshi nage',h:'Koshi-nage',k:'腰投げ',p:'koshi naguê',l:'proyección por la cadera',d:'Tori baja su centro, coloca la cadera cruzada bajo el centro de uke y lo hace pasar por encima. Pide ukemi alto y cuidadoso.',c:'tec'},
+{t:'Sumi otoshi',h:'Sumi-otoshi',k:'隅落とし',p:'sumi otoshi',l:'derribo hacia la esquina',d:'Tori desequilibra a uke hacia su ángulo débil (la «esquina» detrás de su pie) con un movimiento amplio del brazo.',c:'tec'},
+{t:'Aiki otoshi',h:'Aiki-otoshi',k:'合気落とし',p:'aiki otoshi',l:'derribo con aiki',d:'Ante un agarre desde atrás, tori se ubica al costado de uke, se agacha y levanta sus piernas por detrás de las rodillas para proyectarlo hacia atrás.',c:'tec'},
+{t:'Hiji kime osae',h:'Hiji-kime-osae',k:'肘極め抑え',p:'jiyi kime osae',l:'inmovilización controlando el codo',d:'Tori extiende el brazo de uke y controla la articulación del codo hasta llevarlo al suelo.',c:'tec'},
+{t:'Juji garami',h:'Jūji-garami',k:'十字絡み',p:'yúyi garami',l:'enlace en cruz',d:'Tori cruza los brazos de uke uno sobre otro, de modo que quedan trabados en forma de cruz (十), y lo proyecta hacia atrás.',c:'tec',alt:['Juji nage']},
+{t:'Ude garami',h:'Ude-garami',k:'腕絡み',p:'ude garami',l:'enlace del brazo',d:'Tori envuelve y traba el brazo de uke doblándolo. En el programa se pide con entrada uchi kaiten.',c:'tec'},
+{t:'Kokyu nage',h:'Kokyū-nage',k:'呼吸投げ',p:'kokiú naguê',l:'proyección de respiración',d:'Familia de proyecciones que no dependen de luxar una articulación sino del ritmo, el desequilibrio y la unión de movimientos. En jiyu waza, desde 3.º kyu, el programa pide solo este tipo de técnicas.',c:'tec'},
+{t:'Kiri gaeshi',h:'Kiri-kaeshi',k:'切り返し',p:'kiri gaeshi',l:'cortar y volver',d:'Movimiento de corte que cambia de dirección, como la espada que corta y regresa. En el programa nombra una forma de gokyo y de sankyo.',c:'tec',alt:['Kiri kaeshi']},
+{t:'Jiyu waza',h:'Jiyū-waza',k:'自由技',p:'yiyú waza',l:'técnica libre',d:'Uke ataca de manera continua y tori responde con técnicas a su elección, sin pausa. Evalúa fluidez, ritmo y control del espacio.',c:'tec',alt:['Jiju waza','Yiyu waza']},
+{t:'Nage waza',h:'Nage-waza',k:'投げ技',p:'naguê waza',l:'técnicas de proyección',d:'Técnicas que terminan con uke proyectado (shiho nage, irimi nage, kote gaeshi, entre otras).',c:'tec'},
+{t:'Katame waza',h:'Katame-waza',k:'固め技',p:'katame waza',l:'técnicas de control',d:'Técnicas que terminan inmovilizando a uke en el suelo (de ikkyo a gokyo). También se las llama osae waza.',c:'tec',alt:['Osae waza']},
+// posiciones y modalidades
+{t:'Tachi waza',h:'Tachi-waza',k:'立ち技',p:'tachi waza',l:'técnicas de pie',d:'Tori y uke trabajan de pie. Es la mayor parte del programa de cada grado.',c:'pos'},
+{t:'Suwari waza',h:'Suwari-waza',k:'座り技',p:'suwari waza',l:'técnicas sentados',d:'Tori y uke trabajan de rodillas, desplazándose en shikko. Fortalece la cadera y obliga a mover el centro sin usar las piernas como apoyo.',c:'pos',alt:['Zagi','Za waza']},
+{t:'Hanmi handachi waza',h:'Hanmi-handachi-waza',k:'半身半立ち技',p:'janmi jandachi waza',l:'técnicas medio sentado, medio de pie',d:'Tori está de rodillas y uke ataca de pie. Aparece desde 3.º kyu.',c:'pos',alt:['Hami-handachi waza']},
+{t:'Hanmi',h:'Hanmi',k:'半身',p:'janmi',l:'medio cuerpo',d:'Postura triangular básica, con un pie adelantado y el cuerpo de perfil a medias. Reduce el blanco y permite moverse en todas las direcciones.',c:'pos'},
+{t:'Ai hanmi',h:'Ai-hanmi',k:'相半身',p:'ái janmi',l:'medio cuerpo igual',d:'Tori y uke con el mismo pie adelante (derecha con derecha, izquierda con izquierda).',c:'pos'},
+{t:'Gyaku hanmi',h:'Gyaku-hanmi',k:'逆半身',p:'guiaku janmi',l:'medio cuerpo inverso',d:'Tori y uke con pies opuestos adelante (derecha frente a izquierda).',c:'pos'},
+{t:'Kamae',h:'Kamae',k:'構え',p:'kamae',l:'guardia, postura',d:'Postura de preparación, con o sin arma. Incluye la actitud mental de disponibilidad.',c:'pos'},
+{t:'Seiza',h:'Seiza',k:'正座',p:'séiza',l:'sentarse correctamente',d:'Sentado de rodillas sobre los talones, con la espalda recta. Es la posición del saludo y de las explicaciones.',c:'pos'},
+{t:'Shikko',h:'Shikkō',k:'膝行',p:'shikó',l:'andar de rodillas',d:'Forma de desplazarse de rodillas pivotando sobre ellas. Base de suwari waza.',c:'pos'},
+// movimiento y conceptos
+{t:'Omote',h:'Omote',k:'表',p:'omote',l:'frente, lo visible',d:'Variante en la que tori entra por delante de uke, cruzando su línea de ataque.',c:'mov'},
+{t:'Ura',h:'Ura',k:'裏',p:'ura',l:'dorso, lo oculto',d:'Variante en la que tori gira por detrás de uke (normalmente con tenkan), acompañando su fuerza.',c:'mov'},
+{t:'Irimi',h:'Irimi',k:'入身',p:'írimi',l:'entrar con el cuerpo',d:'Entrada directa hacia el costado o la espalda de uke, fuera de la línea de su ataque.',c:'mov'},
+{t:'Tenkan',h:'Tenkan',k:'転換',p:'tenkan',l:'girar, cambiar de dirección',d:'Giro de unos 180° sobre el pie adelantado para quedar mirando en la misma dirección que uke. Las formas del programa indican 180° o 360°.',c:'mov'},
+{t:'Tai sabaki',h:'Tai-sabaki',k:'体捌き',p:'tai sabaki',l:'manejo del cuerpo',d:'Conjunto de desplazamientos y giros (irimi, tenkan, tenshin, entre otros) con los que tori sale de la línea de ataque.',c:'mov'},
+{t:'Interior',h:'Uchi',k:'内',p:'uchi',l:'adentro',d:'En el programa, variante que se realiza por el lado interno del brazo de uke (entre sus brazos). En japonés: uchi.',c:'mov',alt:['Uchi']},
+{t:'Exterior',h:'Soto',k:'外',p:'soto',l:'afuera',d:'Variante que se realiza por el lado externo del brazo de uke. En japonés: soto.',c:'mov',alt:['Soto']},
+{t:'Ukemi',h:'Ukemi',k:'受身',p:'úkemi',l:'recibir con el cuerpo',d:'El arte de caer y recibir la técnica sin lastimarse: rodadas hacia adelante (mae ukemi), hacia atrás (ushiro ukemi) y caídas altas. Aprender a ser uke es la mitad del Aikido.',c:'mov'},
+{t:'Ma-ai',h:'Ma-ai',k:'間合い',p:'ma ai',l:'distancia armoniosa',d:'Distancia justa entre tori y uke: suficiente para no ser alcanzado y para poder intervenir.',c:'mov'},
+{t:'Atemi',h:'Atemi',k:'当身',p:'átemi',l:'golpe al cuerpo',d:'Golpe o amago que distrae o desequilibra dentro de una técnica.',c:'mov'},
+{t:'Kuzushi',h:'Kuzushi',k:'崩し',p:'kuzushi',l:'romper',d:'Desequilibrio de uke. Sin kuzushi no hay técnica: es lo que permite proyectar sin fuerza.',c:'mov'},
+{t:'Zanshin',h:'Zanshin',k:'残心',p:'zanshin',l:'espíritu que permanece',d:'Atención sostenida al terminar la técnica: tori sigue presente y conectado con uke.',c:'mov'},
+{t:'Tegatana',h:'Tegatana',k:'手刀',p:'tegatana',l:'mano espada',d:'El canto de la mano usado como si fuera el filo de una espada. Con él se ataca en shomen uchi y yokomen uchi.',c:'mov'},
+{t:'Kokyu',h:'Kokyū',k:'呼吸',p:'kokiú',l:'respiración',d:'Respiración, y por extensión la coordinación del cuerpo, la mente y el ritmo que da potencia sin tensión.',c:'mov'},
+{t:'Kokyu ho',h:'Kokyū-hō',k:'呼吸法',p:'kokiú jó',l:'método de respiración',d:'Ejercicio con ambas manos tomadas, habitual al final de la clase en seiza (suwari kokyu ho), para desarrollar la extensión desde el centro.',c:'mov',alt:['Kokyu dosa']},
+{t:'Ki',h:'Ki',k:'気',p:'ki',l:'energía, espíritu',d:'Energía vital. En la práctica se traduce en intención, extensión y presencia.',c:'mov'},
+{t:'Musubi',h:'Musubi',k:'結び',p:'musubi',l:'unión, nudo',d:'Conexión entre el movimiento de uke y el de tori, que permite guiar el ataque en lugar de chocarlo.',c:'mov'},
+{t:'Waza',h:'Waza',k:'技',p:'waza',l:'técnica',d:'Técnica. Aparece compuesta en tachi waza, suwari waza, jiyu waza y otras.',c:'mov'},
+{t:'Nage',h:'Nage',k:'投げ',p:'naguê',l:'proyectar; quien proyecta',d:'Proyección. También se usa para nombrar a quien ejecuta la técnica (tori).',c:'mov'},
+{t:'Dori',h:'Dori / tori',k:'取り',p:'dori',l:'tomar, agarrar',d:'Agarre. Como sufijo nombra un ataque (katate dori) o una defensa ante un arma (tanto dori). La t inicial se vuelve d al componer la palabra.',c:'mov'},
+{t:'Uchi',h:'Uchi',k:'打ち',p:'uchi',l:'golpe',d:'Golpe (con 打, en shomen uchi o yokomen uchi). Ojo: el mismo sonido con 内 significa «adentro», como en uchi kaiten.',c:'mov'},
+{t:'Osae',h:'Osae',k:'抑え',p:'osae',l:'contener, sujetar',d:'Inmovilización final en el suelo.',c:'mov'},
+{t:'Futari gake',h:'Futari-gake',k:'二人掛け',p:'futari gake',l:'contra dos personas',d:'Práctica contra dos atacantes a la vez. Se pide desde 2.º dan.',c:'mov',alt:['Futarigake','Futari dori']},
+{t:'Taninzu gake',h:'Taninzu-gake',k:'多人数掛け',p:'taninzu gake',l:'contra muchas personas',d:'Práctica contra tres o más atacantes. Se pide desde 3.º dan.',c:'mov',alt:['Taninzugake']},
+// dojo y etiqueta
+{t:'Aikido',h:'Aikidō',k:'合気道',p:'aikidó',l:'camino de la armonía con la energía',d:'Arte marcial creado por Morihei Ueshiba en el siglo XX. No tiene competencias: se aprende en parejas que se alternan los roles de tori y uke.',c:'dojo'},
+{t:'Aikikai',h:'Aikikai',k:'合気会',p:'aikikai',l:'asociación de aiki',d:'Fundación con sede en el Hombu Dojo de Tokio, dirigida por la familia Ueshiba. Es la organización de Aikido con más alcance en el mundo.',c:'dojo'},
+{t:'O-Sensei',h:'Ō-sensei',k:'大先生',p:'o sensei',l:'gran maestro',d:'Forma respetuosa de nombrar a Morihei Ueshiba (1883-1969), fundador del Aikido.',c:'dojo'},
+{t:'Doshu',h:'Dōshu',k:'道主',p:'dóshu',l:'guardián del camino',d:'Título del líder del Aikikai, heredado en la familia Ueshiba.',c:'dojo'},
+{t:'Hombu Dojo',h:'Honbu dōjō',k:'本部道場',p:'jombu doyó',l:'dojo central',d:'Sede mundial del Aikikai en Tokio.',c:'dojo'},
+{t:'Dojo',h:'Dōjō',k:'道場',p:'doyó',l:'lugar del camino',d:'Espacio donde se practica. Se saluda al entrar y al salir.',c:'dojo'},
+{t:'Tatami',h:'Tatami',k:'畳',p:'tatami',l:'estera',d:'Superficie de práctica. Tradicionalmente, esteras de paja de arroz trenzada.',c:'dojo'},
+{t:'Kamiza',h:'Kamiza',k:'上座',p:'kamiza',l:'asiento superior',d:'Frente del dojo, donde suele estar la foto de O-Sensei. Se saluda hacia allí al comenzar y terminar.',c:'dojo',alt:['Shomen']},
+{t:'Sensei',h:'Sensei',k:'先生',p:'sensei',l:'el que nació antes',d:'Maestro o maestra. Se usa para quien dirige la clase.',c:'dojo'},
+{t:'Shihan',h:'Shihan',k:'師範',p:'shijan',l:'maestro modelo',d:'Título de maestro de alto nivel otorgado por el Aikikai.',c:'dojo'},
+{t:'Sempai',h:'Senpai',k:'先輩',p:'sempai',l:'compañero mayor',d:'Quien practica desde antes que tú. Su contraparte es kohai.',c:'dojo',alt:['Kohai']},
+{t:'Tori',h:'Tori',k:'取り',p:'tori',l:'quien toma',d:'Quien ejecuta la técnica. En muchos dojos se dice nage.',c:'dojo',alt:['Nage','Shite']},
+{t:'Uke',h:'Uke',k:'受け',p:'uke',l:'quien recibe',d:'Quien ataca y recibe la técnica. Un buen uke ataca con sinceridad y cuida su cuerpo con el ukemi.',c:'dojo'},
+{t:'Keikogi',h:'Keikogi',k:'稽古着',p:'keikogui',l:'ropa de práctica',d:'Uniforme blanco de práctica. Se lo llama también dogi o simplemente gi.',c:'dojo',alt:['Dogi','Gi']},
+{t:'Hakama',h:'Hakama',k:'袴',p:'jakama',l:'falda pantalón',d:'Pantalón amplio y plisado, habitualmente azul oscuro o negro. Su uso según el grado depende de cada dojo.',c:'dojo'},
+{t:'Obi',h:'Obi',k:'帯',p:'obi',l:'cinturón',d:'Cinturón. El color indica el grado en este programa.',c:'dojo'},
+{t:'Keiko',h:'Keiko',k:'稽古',p:'keiko',l:'reflexionar sobre lo antiguo',d:'Práctica, entrenamiento.',c:'dojo'},
+{t:'Rei',h:'Rei',k:'礼',p:'rei',l:'cortesía, saludo',d:'Saludo con inclinación, de pie (ritsurei) o en seiza (zarei).',c:'dojo'},
+{t:'Onegaishimasu',h:'Onegai shimasu',k:'お願いします',p:'onegaishimás',l:'por favor',d:'Se dice al saludar a la pareja antes de practicar: «por favor, practiquemos juntos».',c:'dojo'},
+{t:'Domo arigato gozaimashita',h:'Dōmo arigatō gozaimashita',k:'どうもありがとうございました',p:'dómo arigató gozaimáshta',l:'muchas gracias (por lo hecho)',d:'Agradecimiento formal al terminar la práctica o la clase.',c:'dojo'},
+{t:'Mokuso',h:'Mokusō',k:'黙想',p:'mokusó',l:'meditación en silencio',d:'Breve meditación en seiza al empezar o terminar la clase.',c:'dojo'},
+// grados
+{t:'Kyu',h:'Kyū',k:'級',p:'kiú',l:'clase, nivel',d:'Grado previo al cinturón negro. Se cuenta hacia abajo: del 5.º kyu (inicial) al 1.º kyu (último antes de dan).',c:'gra'},
+{t:'Dan',h:'Dan',k:'段',p:'dan',l:'escalón',d:'Grado de cinturón negro. Se cuenta hacia arriba: 1.º dan (shodan), 2.º (nidan), 3.º (sandan), 4.º (yondan)…',c:'gra'},
+{t:'Shodan',h:'Shodan',k:'初段',p:'shodan',l:'primer escalón',d:'Primer dan. Más que un final, marca el comienzo del estudio en profundidad.',c:'gra'},
+{t:'Mudansha',h:'Mudansha',k:'無段者',p:'mudansha',l:'persona sin dan',d:'Quien practica y todavía tiene grado de kyu.',c:'gra'},
+{t:'Yudansha',h:'Yūdansha',k:'有段者',p:'iúdansha',l:'persona con dan',d:'Quien tiene grado de dan.',c:'gra'},
+{t:'Cinturones de color',h:'—',k:'色帯',p:'—',l:'—',d:'En el Hombu Dojo los kyu usan cinturón blanco. Este programa usa colores (amarillo, naranja, verde, azul, marrón) para que el avance sea visible, una convención común en Argentina y en muchos dojos del mundo.',c:'gra'},
+// armas
+{t:'Bokken',h:'Bokken',k:'木剣',p:'boken',l:'espada de madera',d:'Espada de madera para practicar. Muchos movimientos del Aikido vienen de la esgrima japonesa.',c:'arm',alt:['Bokuto']},
+{t:'Jo',h:'Jō',k:'杖',p:'yó',l:'bastón',d:'Bastón de madera de unos 128 cm.',c:'arm'},
+{t:'Tanto',h:'Tantō',k:'短刀',p:'tantó',l:'espada corta',d:'Cuchillo de madera usado en la práctica de defensas.',c:'arm'},
+{t:'Tanto dori',h:'Tantō-dori',k:'短刀取り',p:'tantó dori',l:'quitar el cuchillo',d:'Defensas ante ataques con tanto. Se pide desde 2.º dan.',c:'arm'},
+{t:'Tachi dori',h:'Tachi-dori',k:'太刀取り',p:'tachi dori',l:'quitar la espada',d:'Defensas desarmado ante ataques con espada. Se pide desde 3.º dan.',c:'arm'},
+{t:'Jo dori',h:'Jō-dori',k:'杖取り',p:'yó dori',l:'quitar el bastón',d:'Defensas desarmado ante ataques con jo. Se pide desde 3.º dan.',c:'arm'},
+{t:'Suburi',h:'Suburi',k:'素振り',p:'suburi',l:'balanceo simple',d:'Cortes y estocadas individuales con bokken o jo, repetidos para pulir la forma.',c:'arm'}
+];
+
+/* ============ utilidades ============ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const yt=id=>'https://www.youtube.com/watch?v='+id;
+const PLAY='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>';
+const store={get(k,d){try{const v=localStorage.getItem('aikiwiki:'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('aikiwiki:'+k,JSON.stringify(v))}catch(e){}}};
+let done=store.get('done',{}), seen=store.get('seen',{});
+
+/* índice del glosario: término + variantes → entrada */
+const GIDX={};
+GL.forEach((e,i)=>{e.i=i;e.key=norm(e.t);[e.t,...(e.alt||[])].forEach(n=>{const k=norm(n.replace(/\(.*\)/,''));if(!(k in GIDX))GIDX[k]=i})});
+function gFind(name){return GIDX[norm(name)]}
+
+/* aplanar programa: filas con claves estables */
+const FLAT=[];
+GRADES.forEach(g=>g.sections.forEach(s=>s.items.forEach((it,ii)=>{
+  (it.rows||[]).forEach((r,ri)=>{const key=`${g.id}|${s.m}|${ii}|${ri}`;FLAT.push({g,s,it,r,key})})
+})));
+/* ¿qué es nuevo en cada grado? (técnica o combinación ataque+técnica+posición que no aparece antes) */
+const order=['5','4','3','2','1'];
+const seenTech=new Set(), seenCombo=new Set();
+order.forEach(gid=>{
+  const g=GRADES.find(x=>x.id===gid);
+  const nt=new Set(),nc=new Set();
+  g.sections.forEach(s=>s.items.forEach(it=>{
+    const tk=norm(it.t); if(!seenTech.has(tk)) nt.add(tk);
+    (it.rows||[]).forEach(r=>{const ck=s.m+'|'+norm(r.a)+'|'+tk; if(!seenCombo.has(ck)) nc.add(ck)})
+  }));
+  nt.forEach(x=>seenTech.add(x)); nc.forEach(x=>seenCombo.add(x));
+  g.newTech=nt; g.newCombo=nc;
+});
+/* dónde aparece cada término del glosario */
+const WHERE={};
+function addWhere(name,gid){const i=gFind(name);if(i==null)return;(WHERE[i]=WHERE[i]||new Set()).add(gid)}
+GRADES.forEach(g=>g.sections.forEach(s=>{
+  addWhere(MODS[s.m].n,g.id);
+  s.items.forEach(it=>{addWhere(it.t,g.id);(it.rows||[]).forEach(r=>{addWhere(r.a,g.id);r.v.forEach(([l])=>{const b=l.replace(/\(.*\)/,'').trim();['Omote','Ura','Interior','Exterior','Kiri gaeshi','Uchi kaiten','Soto kaiten'].forEach(w=>{if(norm(b).startsWith(norm(w)))addWhere(w==='Uchi kaiten'?'Uchi kaiten nage':w==='Soto kaiten'?'Soto kaiten nage':w,g.id)})})})});
+}));
+function stats(g){let t=new Set(),a=new Set(),v=0,rows=0;g.sections.forEach(s=>s.items.forEach(it=>{if(it.rows){t.add(norm(it.t));it.rows.forEach(r=>{a.add(norm(r.a));v+=r.v.length;rows++})}}));return{t:t.size,a:a.size,v,rows}}
+
+/* ============ navegación ============ */
+let view='inicio', gradeId=store.get('grade','5'), modFilter='all';
+function go(v,opts={}){
+  view=v;
+  $$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+  $$('#nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.go===v?'page':'false'));
+  if(v==='programa')renderGrade();
+  if(v==='practica')renderPractice();
+  $('#main').classList.toggle('window',v==='inicio');updatePct();
+  if(!opts.keepScroll)$('#main').scrollTop=0;
+  history.replaceState(null,'','#'+v+(v==='programa'?'-'+gradeId:''));
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){e.preventDefault();go(b.dataset.go)}});
+function openGrade(id,anchor){gradeId=id;store.set('grade',id);modFilter='all';$('#q').value='';$('#onlyNew').checked=false;go('programa');if(anchor){requestAnimationFrame(()=>{const el=document.getElementById(anchor);if(el){el.scrollIntoView({block:'center'});el.classList.add('flash');const t=el.querySelector('.term');t&&t.focus({preventScroll:true})}})}}
+
+/* ============ INICIO ============ */
+function renderHome(){
+  const L=$('#ladder');
+  L.innerHTML=GRADES.map(g=>{const s=stats(g);return `<button class="rung" data-grade="${g.id}"><span class="obi" style="background:${g.color}"></span><span class="gk">${g.kyu}</span><span class="gn">${g.jp} ${g.read}, cinturón ${g.belt.toLowerCase()}</span><span class="gs">${s.t} técnicas, ${s.v} videos</span></button>`}).join('')+
+  `<button class="rung" data-go="danes"><span class="obi" style="background:var(--bd);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)"></span><span class="gk">Danes</span><span class="gn">段 cinturón negro</span><span class="gs">del 1.º al 4.º dan</span></button>`;
+  L.querySelectorAll('[data-grade]').forEach(b=>b.onclick=()=>openGrade(b.dataset.grade));
+  $('#sideBelts').innerHTML=GRADES.map(g=>`<button class="beltlink" data-grade="${g.id}"><i style="background:${g.color}"></i>${g.kyu}<span class="pc" data-pc="${g.id}"></span></button>`).join('');
+  $$('#sideBelts [data-grade]').forEach(b=>b.onclick=()=>openGrade(b.dataset.grade));
+  updatePct();
+}
+function pct(g){const rows=FLAT.filter(f=>f.g===g);const d=rows.filter(f=>done[f.key]).length;return{d,n:rows.length,p:rows.length?Math.round(d*100/rows.length):0}}
+function updatePct(){GRADES.forEach(g=>{const el=document.querySelector(`[data-pc="${g.id}"]`);if(el){const p=pct(g);el.textContent=p.d?p.p+' %':''}});$$('#sideBelts .beltlink').forEach(b=>b.setAttribute('aria-current',view==='programa'&&b.dataset.grade===gradeId?'true':'false'))}
+
+/* ============ PROGRAMA ============ */
+function term(name,cls=''){const i=gFind(name);return i==null?`<span class="${cls}">${esc(name)}</span>`:`<button class="term ${cls}" data-g="${i}">${esc(name)}</button>`}
+function renderGrade(){
+  const g=GRADES.find(x=>x.id===gradeId), s=stats(g);
+  $('#gradeHead').innerHTML=`<div class="ghead"><div class="gkan" aria-hidden="true">${g.jp}</div><div><h1 id="h-prog">${g.kyu}</h1><div class="meta">${g.read}, cinturón ${g.belt.toLowerCase()}</div></div><span class="bar" style="background:${g.color}"></span></div>
+  <div class="gstats"><div><b>${s.t}</b>técnicas</div><div><b>${s.a}</b>ataques distintos</div><div><b>${s.rows}</b>combinaciones</div><div><b>${s.v}</b>videos</div><div><b>${g.newCombo.size}</b>combinaciones nuevas</div></div>`;
+  $('#gradeSeg').innerHTML=GRADES.map(x=>`<button aria-pressed="${x.id===gradeId}" data-gid="${x.id}"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${x.color};margin-right:6px;vertical-align:-1px"></span>${x.id}.º</button>`).join('');
+  $$('#gradeSeg button').forEach(b=>b.onclick=()=>openGrade(b.dataset.gid));
+  const mods=g.sections.map(x=>x.m);
+  $('#modSeg').innerHTML=[['all','Todo'],...mods.map(m=>[m,MODS[m].n.replace(' waza','')])].map(([k,n])=>`<button aria-pressed="${modFilter===k}" data-m="${k}">${n}</button>`).join('');
+  $$('#modSeg button').forEach(b=>b.onclick=()=>{modFilter=b.dataset.m;renderGrade()});
+  renderGradeBody();updatePct();
+}
+function renderGradeBody(){
+  const g=GRADES.find(x=>x.id===gradeId), q=norm($('#q').value), onlyNew=$('#onlyNew').checked;
+  let html='',any=false;
+  g.sections.forEach(s=>{
+    if(modFilter!=='all'&&modFilter!==s.m)return;
+    let inner='';
+    s.items.forEach((it,ii)=>{
+      const tk=norm(it.t), isNewT=g.newTech.has(tk);
+      if(it.free){ if(q&&!norm(it.t+' '+it.free).includes(q))return; if(onlyNew&&!isNewT)return;
+        inner+=`<div class="tech"><div class="tn">${term(it.t)}<span class="tk">${GL[gFind(it.t)]?.k||''}</span></div><div class="free">${esc(it.free)}</div></div>`;return}
+      const rows=it.rows.map((r,ri)=>({r,ri,key:`${g.id}|${s.m}|${ii}|${ri}`,isNew:g.newCombo.has(s.m+'|'+norm(r.a)+'|'+tk)}))
+        .filter(o=>(!q||norm(it.t+' '+(it.sub||'')+' '+o.r.a+' '+o.r.v.map(v=>v[0]).join(' ')).includes(q))&&(!onlyNew||o.isNew));
+      if(!rows.length)return;
+      const gi=gFind(it.t);
+      inner+=`<div class="tech" id="t-${g.id}-${s.m}-${tk.replace(/ /g,'-')}"><div class="tn">${term(it.t)}${it.sub?`<span class="ph" style="font-size:12.5px;color:var(--muted)">${esc(it.sub)}</span>`:''}<span class="tk">${gi!=null?GL[gi].k:''}</span>${isNewT?'<span class="new">nuevo en este grado</span>':''}${it.ref?`<button class="ref" data-ref="${it.ref}" data-t="${esc(it.t)}">${PLAY.replace('aria-hidden','style="width:12px;height:12px;fill:currentColor" aria-hidden')} Video de referencia</button>`:''}</div><div class="rows">`+
+      rows.map(o=>`<div class="row${done[o.key]?' done':''}"><input type="checkbox" aria-label="Marcar ${esc(o.r.a)} ${esc(it.t)} como practicada" data-done="${o.key}" ${done[o.key]?'checked':''}><div class="atk">${term(o.r.a)}${o.isNew&&!isNewT?' <span class="new">nuevo</span>':''}</div><div class="vids">${o.r.v.map(([l,id],vi)=>`<button class="vb${seen[id]?' seen':''}" data-key="${o.key}" data-vi="${vi}" data-id="${id}" aria-label="Ver ${esc(o.r.a)} ${esc(it.t)}, ${esc(l)}">${PLAY}${esc(l)}</button>`).join('')}</div></div>`).join('')+`</div></div>`;
+    });
+    if(inner){any=true;html+=`<section class="mod"><h2>${term(MODS[s.m].n)} <span class="jp">${MODS[s.m].jp}</span></h2><p class="desc">${MODS[s.m].d}</p>${inner}</section>`}
+  });
+  $('#gradeBody').innerHTML=any?html:`<p class="empty">No hay técnicas que coincidan con «${esc($('#q').value)}» en este grado. Prueba con otro ataque o borra el filtro.</p>`;
+  markCurrent();
+}
+$('#q').addEventListener('input',renderGradeBody);
+$('#onlyNew').addEventListener('change',renderGradeBody);
+$('#gradeBody').addEventListener('click',e=>{
+  const vb=e.target.closest('.vb'); if(vb){openVideo(vb.dataset.key,+vb.dataset.vi);return}
+  const rf=e.target.closest('.ref'); if(rf){openRef(rf.dataset.ref,rf.dataset.t);return}
+});
+$('#gradeBody').addEventListener('change',e=>{const c=e.target.closest('[data-done]');if(!c)return;if(c.checked)done[c.dataset.done]=1;else delete done[c.dataset.done];store.set('done',done);c.closest('.row').classList.toggle('done',c.checked);updatePct()});
+$('#playAll').onclick=()=>{const f=FLAT.find(x=>x.g.id===gradeId&&(modFilter==='all'||x.s.m===modFilter));if(f)openVideo(f.key,0)};
+
+/* ============ DOCK DE VIDEO ============ */
+/* Dentro de claude.ai la política de seguridad bloquea los reproductores externos: ahí se usa el enlace.
+   En cualquier otro alojamiento (GitHub Pages, Google Sites, Netlify) el video se reproduce dentro de la página. */
+const HOSTED_IN_CLAUDE=/claude/i.test(location.hostname);
+let queue=[],qpos=-1,embed=HOSTED_IN_CLAUDE?store.get('embed',false):true,refMode=null;
+function buildQueue(gid){queue=[];FLAT.filter(f=>f.g.id===gid&&(modFilter==='all'||f.s.m===modFilter||view!=='programa')).forEach(f=>f.r.v.forEach(([l,id],vi)=>queue.push({f,l,id,vi})))}
+function openVideo(key,vi){
+  const f=FLAT.find(x=>x.key===key); if(!f)return;
+  buildQueue(f.g.id); qpos=queue.findIndex(q=>q.f.key===key&&q.vi===vi); refMode=null; showDock();
+}
+function openRef(id,t){refMode={id,t};showDock()}
+function showDock(){
+  const app=$('#app');app.classList.remove('nodock');app.classList.add('showdock');
+  let id,l1,l2,l3;
+  if(refMode){id=refMode.id;l1='Video de referencia de la técnica';l2=refMode.t;l3='Muestra la forma general, sin un ataque específico.'}
+  else{const q=queue[qpos];id=q.id;l1=`${q.f.g.kyu}, ${MODS[q.f.s.m].n}`;l2=`${q.f.r.a} ${q.f.it.t}`;l3=q.l==='Video'?'Única variante del programa':'Variante: '+q.l;seen[id]=1;store.set('seen',seen)}
+  $('#screen').innerHTML=embed?`<iframe src="https://www.youtube-nocookie.com/embed/${id}?rel=0" title="${esc(l2)}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>`
+    :`<div class="ph"><span class="big" aria-hidden="true">${refMode?'型':(GL[gFind(queue[qpos].f.it.t)]?.k||'技')}</span><span>El video se abre en YouTube, en una pestaña nueva.</span></div>`;
+  $('#vt').innerHTML=`<div class="l1">${esc(l1)}</div><div class="l2">${esc(l2)}</div><div class="l3">${esc(l3)}</div>`;
+  $('#vbtns').innerHTML=`<a class="btn pri" href="${yt(id)}" target="_blank" rel="noopener">Abrir en YouTube ↗</a>`+
+    (refMode?'':`<button class="btn" id="prevV" ${qpos<=0?'disabled':''} aria-label="Variante anterior">←</button><button class="btn" id="nextV" ${qpos>=queue.length-1?'disabled':''} aria-label="Variante siguiente">→</button>`)+
+    `<button class="btn" id="embedT" aria-pressed="${embed}">${embed?'Mostrar solo el enlace':'Reproducir aquí'}</button>`;
+  $('#embedT').onclick=()=>{embed=!embed;store.set('embed',embed);showDock()};
+  if(!refMode){$('#prevV').onclick=()=>step(-1);$('#nextV').onclick=()=>step(1)}
+  $('#queue').innerHTML=refMode?'':`<div>Repaso de ${queue[qpos].f.g.kyu}: ${qpos+1} de ${queue.length}</div><ol>${queue.map((q,i)=>`<li class="${i===qpos?'cur':''}"><button data-q="${i}">${esc(q.f.r.a)} ${esc(q.f.it.t)}${q.l!=='Video'?', '+esc(q.l.toLowerCase()):''}</button></li>`).join('')}</ol><p class="kbdhint">Atajos: ← → cambian de variante, Esc cierra.</p>`;
+  $$('#queue [data-q]').forEach(b=>b.onclick=()=>{qpos=+b.dataset.q;showDock()});
+  const cur=$('#queue li.cur');cur&&cur.scrollIntoView({block:'nearest'});
+  markCurrent();
+}
+function step(d){if(refMode)return;const n=qpos+d;if(n<0||n>=queue.length)return;qpos=n;showDock()}
+function markCurrent(){$$('.vb').forEach(b=>{const q=queue[qpos];const on=!refMode&&q&&b.dataset.key===q.f.key&&+b.dataset.vi===q.vi;b.classList.toggle('cur',on);if(seen[b.dataset.id])b.classList.add('seen')})}
+function closeDock(){$('#app').classList.add('nodock');$('#app').classList.remove('showdock');$('#screen').innerHTML='';qpos=-1;refMode=null;markCurrent()}
+$('#closeDock').onclick=closeDock;
+document.addEventListener('keydown',e=>{
+  const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if(e.key==='Escape'){if($('#pop').classList.contains('on'))hidePop();else if(!$('#app').classList.contains('nodock'))closeDock()}
+  if(typing)return;
+  if(e.key==='/'){e.preventDefault();if(view==='glosario')$('#gq').focus();else{if(view!=='programa')go('programa');$('#q').focus()}}
+  if(!$('#app').classList.contains('nodock')&&!refMode){if(e.key==='ArrowRight'){step(1)}if(e.key==='ArrowLeft'){step(-1)}}
+});
+
+/* ============ POPOVER DEL GLOSARIO ============ */
+function showPop(i,anchor){
+  const e=GL[i],p=$('#pop');
+  p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><h3>${esc(e.t)}</h3><span class="kj" lang="ja">${e.k}</span></div><div class="ph">${e.h!=='—'?esc(e.h)+', se pronuncia «'+esc(e.p)+'»':''}</div><p>${esc(e.d)}</p>${e.l!=='—'?`<div class="ph">Literal: ${esc(e.l)}</div>`:''}<p style="margin-top:8px"><button data-full="${i}">Ver en el glosario</button></p>`;
+  p.classList.add('on');
+  const r=anchor.getBoundingClientRect(),pw=Math.min(340,innerWidth-20);
+  let x=Math.min(r.left,innerWidth-pw-10),y=r.bottom+8;
+  p.style.left=Math.max(10,x)+'px';p.style.top='0px';
+  const ph=p.offsetHeight; if(y+ph>innerHeight-10)y=Math.max(10,r.top-ph-8);
+  p.style.top=y+'px';
+  p.querySelector('[data-full]').onclick=()=>{hidePop();openGloss(i)};
+}
+function hidePop(){$('#pop').classList.remove('on')}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('.term');
+  if(t){e.stopPropagation();showPop(+t.dataset.g,t);return}
+  if(!e.target.closest('#pop'))hidePop();
+});
+$('#main').addEventListener('scroll',hidePop);
+
+/* ============ GLOSARIO ============ */
+let gcat='all';
+function renderGlossCats(){
+  const counts={};GL.forEach(e=>counts[e.c]=(counts[e.c]||0)+1);
+  $('#gcats').innerHTML=[['all','Todo ('+GL.length+')'],...Object.entries(CATS).map(([k,n])=>[k,n+' ('+counts[k]+')'])].map(([k,n])=>`<button class="chip" aria-pressed="${gcat===k}" data-c="${k}">${n}</button>`).join('');
+  $$('#gcats .chip').forEach(b=>b.onclick=()=>{gcat=b.dataset.c;renderGlossCats();renderGloss()});
+}
+function renderGloss(hl){
+  const q=norm($('#gq').value);
+  const list=GL.filter(e=>(gcat==='all'||e.c===gcat)&&(!q||norm([e.t,e.h,e.l,e.d,...(e.alt||[])].join(' ')).includes(q))).sort((a,b)=>a.key.localeCompare(b.key));
+  const letters=new Set(list.map(e=>e.key[0].toUpperCase()));
+  $('#alpha').innerHTML='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(L=>letters.has(L)?`<a href="#L-${L}" data-l="${L}">${L}</a>`:`<span aria-hidden="true">${L}</span>`).join('');
+  $$('#alpha a').forEach(a=>a.onclick=ev=>{ev.preventDefault();document.getElementById('L-'+a.dataset.l)?.scrollIntoView({block:'start'})});
+  let cur='',html='';
+  list.forEach(e=>{
+    const L=e.key[0].toUpperCase(); if(L!==cur){cur=L;html+=`<div class="letter" id="L-${L}">${L}</div>`}
+    const w=[...(WHERE[e.i]||[])].sort().reverse();
+    html+=`<article class="entry${hl===e.i?' hl':''}" id="g-${e.i}"><div class="top"><h3>${esc(e.t)}</h3><span class="kj" lang="ja">${e.k}</span></div>
+    ${e.h!=='—'?`<div class="ph">${esc(e.h)}, se pronuncia «${esc(e.p)}»</div>`:''}
+    <p class="def">${esc(e.d)}</p>${e.l!=='—'?`<div class="lit">Literal: ${esc(e.l)}</div>`:''}
+    ${e.alt?`<div class="lit">También: ${e.alt.map(esc).join(', ')}</div>`:''}
+    <div class="foot"><span class="tag">${CATS[e.c]}</span>${w.map(gid=>{const g=GRADES.find(x=>x.id===gid);return `<button class="where" style="background:${g.hex}" data-wg="${gid}" data-wt="${e.i}" aria-label="Ver en ${g.kyu}">${g.id}.º kyu</button>`}).join('')}</div></article>`;
+  });
+  $('#gl').innerHTML=html||`<p class="empty">Ningún término coincide con «${esc($('#gq').value)}». Prueba con la palabra en castellano o sin tildes.</p>`;
+  $$('#gl .where').forEach(b=>b.onclick=()=>{const e=GL[+b.dataset.wt];const g=GRADES.find(x=>x.id===b.dataset.wg);gradeId=g.id;
+    const s=g.sections.find(s=>s.items.some(it=>norm(it.t)===e.key));openGrade(g.id,s?`t-${g.id}-${s.m}-${e.key.replace(/ /g,'-')}`:null);if(!s){$('#q').value=e.t.split(' ')[0];renderGradeBody()}});
+}
+function openGloss(i){gcat='all';$('#gq').value='';renderGlossCats();go('glosario');renderGloss(i);requestAnimationFrame(()=>document.getElementById('g-'+i)?.scrollIntoView({block:'center'}))}
+$('#gq').addEventListener('input',()=>renderGloss());
+
+/* ============ MAPA DE TÉCNICAS ============ */
+let mapMod='tachi';
+function renderMap(){
+  $('#mapSeg').innerHTML=Object.entries(MODS).map(([k,m])=>`<button aria-pressed="${mapMod===k}" data-mm="${k}">${m.n}</button>`).join('');
+  $$('#mapSeg button').forEach(b=>b.onclick=()=>{mapMod=b.dataset.mm;renderMap()});
+  const techs=[];GRADES.forEach(g=>g.sections.filter(s=>s.m===mapMod).forEach(s=>s.items.forEach(it=>{if(it.rows&&!techs.includes(it.t))techs.push(it.t)})));
+  $('#mtx').innerHTML=`<caption class="sr">Cantidad de ataques por técnica y grado en ${MODS[mapMod].n}</caption><thead><tr><th scope="col">Técnica</th>${GRADES.map(g=>`<th scope="col" class="c"><span style="display:inline-block;width:18px;height:6px;border-radius:2px;background:${g.color};vertical-align:middle;margin-right:5px"></span>${g.kyu}</th>`).join('')}</tr></thead><tbody>`+
+  techs.map(t=>`<tr><th scope="row">${term(t)}</th>${GRADES.map(g=>{const s=g.sections.find(s=>s.m===mapMod);const it=s&&s.items.find(i=>i.t===t);
+    return `<td class="c">${it?`<button class="dot" style="background:${g.hex}" data-mg="${g.id}" data-mt="${esc(t)}" title="${esc(it.rows.map(r=>r.a).join(', '))}" aria-label="${esc(t)} en ${g.kyu}: ${esc(it.rows.map(r=>r.a).join(', '))}">${it.rows.length}</button>`:'<span class="dash" aria-label="no se pide">–</span>'}</td>`}).join('')}</tr>`).join('')+'</tbody>';
+  $$('#mtx .dot').forEach(b=>b.onclick=()=>{const k=norm(b.dataset.mt).replace(/ /g,'-');openGrade(b.dataset.mg,`t-${b.dataset.mg}-${mapMod}-${k}`)});
+}
+
+/* ============ DANES ============ */
+function renderDans(){$('#dans').innerHTML=DANS.map(d=>`<div class="dan"><div><div class="dk" lang="ja">${d.k}</div><div class="dn">${d.n}, ${d.r}</div></div><div><p>${linkTerms(d.t)}</p><div class="orig">${esc(d.o)}</div></div></div>`).join('')}
+function linkTerms(txt){
+  const names=['suwari waza','hanmi handachi waza','tachi waza','yokomen uchi','shomen uchi','tsuki','tanto dori','futari gake','tachi dori','jo dori','taninzu gake','Jiyu waza'];
+  let out=esc(txt);names.forEach(n=>{const i=gFind(n);if(i==null)return;out=out.replace(new RegExp('\\b'+n.replace(/ /g,'\\s')+'\\b','i'),m=>`<button class="term" data-g="${i}">${m}</button>`)});return out;
+}
+
+/* ============ MI PRÁCTICA ============ */
+let quizG='5',quizCur=null,quizShown=false;
+function renderPractice(){
+  $('#prog').innerHTML=GRADES.map(g=>{const p=pct(g);return `<div class="pg"><div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-family:var(--serif);font-size:18px">${g.kyu}</b><span class="n">${p.p} %</span></div><div class="meter" role="progressbar" aria-valuenow="${p.p}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance en ${g.kyu}"><i style="width:${p.p}%;background:${g.color}"></i></div><div class="n">${p.d} de ${p.n} combinaciones practicadas</div></div>`}).join('');
+  renderQuiz();
+}
+function pickQuiz(){const pool=FLAT.filter(f=>f.g.id===quizG);const pend=pool.filter(f=>!done[f.key]);const src=pend.length?pend:pool;let n;do{n=src[Math.floor(Math.random()*src.length)]}while(src.length>1&&n===quizCur);quizCur=n;quizShown=false;renderQuiz()}
+function renderQuiz(){
+  const Q=$('#quiz');
+  const seg=`<div class="seg" role="group" aria-label="Grado del repaso" style="width:max-content">${GRADES.map(g=>`<button aria-pressed="${g.id===quizG}" data-qg="${g.id}">${g.id}.º</button>`).join('')}</div>`;
+  if(!quizCur||quizCur.g.id!==quizG){Q.innerHTML=`<h2>Repaso al azar</h2><p class="qs" style="margin-top:6px">El examinador anuncia un ataque y una técnica. Ejecútala mentalmente (o en el tatami) antes de mirar el video. Da prioridad a lo que todavía no marcaste.</p>${seg}<div class="btns"><button class="btn pri" id="qStart">Pedir una técnica</button></div>`;}
+  else{const f=quizCur;Q.innerHTML=`${seg}<div class="qs" style="margin-top:14px">${f.g.kyu}, ${MODS[f.s.m].n}</div><div class="q">${esc(f.r.a)} ${esc(f.it.t)}</div><div class="qs">${quizShown?'Variantes: '+f.r.v.map(v=>esc(v[0])).join(', '):'¿Qué variantes pide el programa? Piénsalo y luego revísalo.'}</div>
+    <div class="btns">${quizShown?f.r.v.map(([l],vi)=>`<button class="btn" data-qv="${vi}">▶ ${esc(l)}</button>`).join(''):'<button class="btn" id="qShow">Mostrar variantes</button>'}<button class="btn pri" id="qOk">La tengo, marcar y seguir</button><button class="btn" id="qNext">Otra técnica</button></div>`}
+  $$('#quiz [data-qg]').forEach(b=>b.onclick=()=>{quizG=b.dataset.qg;quizCur=null;renderQuiz()});
+  $('#qStart')&&($('#qStart').onclick=pickQuiz);
+  $('#qShow')&&($('#qShow').onclick=()=>{quizShown=true;renderQuiz()});
+  $('#qNext')&&($('#qNext').onclick=pickQuiz);
+  $('#qOk')&&($('#qOk').onclick=()=>{done[quizCur.key]=1;store.set('done',done);updatePct();renderPractice();pickQuiz()});
+  $$('#quiz [data-qv]').forEach(b=>b.onclick=()=>openVideo(quizCur.key,+b.dataset.qv));
+}
+$('#resetBtn').onclick=()=>{if(confirm('¿Borrar las marcas de práctica y los videos vistos de este navegador?')){done={};seen={};store.set('done',done);store.set('seen',seen);renderPractice();updatePct()}};
+
+/* ============ TEMA ============ */
+const root=document.documentElement;
+function applyTheme(t){if(t)root.setAttribute('data-theme',t);else root.removeAttribute('data-theme')}
+applyTheme(store.get('theme',null));
+$('#themeBtn').onclick=()=>{const cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');const n=cur==='light'?'dark':'light';applyTheme(n);store.set('theme',n)};
+
+/* =============================================================
+   FONDO: tatami visto desde arriba con dos practicantes que
+   repiten patrones de tai sabaki (como un video en bucle).
+   ============================================================= */
+const cv=$('#mat'),cx=cv.getContext('2d');
+let W,H,DPR,paused=matchMedia('(prefers-reduced-motion: reduce)').matches,last=0,T=0;
+const trail=document.createElement('canvas'),tx=trail.getContext('2d');
+function isLight(){const t=root.getAttribute('data-theme');return t?t==='light':matchMedia('(prefers-color-scheme: light)').matches}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;[cv,trail].forEach(c=>{c.width=W*DPR;c.height=H*DPR});cx.setTransform(DPR,0,0,DPR,0,0);tx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',resize);resize();
+const PATTERNS=[
+ {n:'tenkan',d:'giro de 180° sobre el pie adelantado'},
+ {n:'irimi',d:'entrada al costado de uke'},
+ {n:'irimi tenkan',d:'entrar y girar en un solo movimiento'},
+ {n:'shiho nage',d:'corte en las cuatro direcciones'}
+];
+const DUR=9;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function pose(p,t){ /* t en 0..1; unidades en metros aprox. alrededor del centro */
+  const k=ease(Math.min(1,Math.max(0,(t-.15)/.6)));
+  if(p===0){ const a=Math.PI*k; return{T:[0,0],Ta:Math.PI+ a,U:[-1.1*Math.cos(a)+(t<.15?-.8*(1-t/.15):0),-1.1*Math.sin(a)*.9]} }
+  if(p===1){ const tp=[.9*k,-.5*k+ .9*k*k]; const ua=Math.PI*.8*k; return{T:tp,Ta:-Math.PI/2+ua,U:[ -1+ Math.sin(ua)*1.2, Math.cos(ua)*1.2-1.2 + (t<.15?0:0)]} }
+  if(p===2){ const e=Math.min(1,k*1.6), r=Math.max(0,k*1.6-.6)/1; const a=Math.PI*Math.min(1,r); return{T:[.6*e,0],Ta:a,U:[-1.2+ .6*e -Math.cos(a)*.1, -Math.sin(a)*1.3]} }
+  const a=Math.PI*2*k; return{T:[Math.cos(a*.5)*.5,Math.sin(a*.5)*.5],Ta:a*.5,U:[Math.cos(a*.5+Math.PI)*1.1,Math.sin(a*.5+Math.PI)*1.1]};
+}
+let lastPat=-1,FX=.8,FY=.27,FS=6.4;
+function frame(ts){
+  const dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(!paused)T+=dt;
+  const light=isLight();
+  const cyc=Math.floor(T/DUR),p=cyc%PATTERNS.length,t=(T%DUR)/DUR;
+  if(p!==lastPat){lastPat=p;$('#bgcap').innerHTML=`Fondo: <b>${PATTERNS[p].n}</b>, ${PATTERNS[p].d} (vista desde arriba)`;tx.clearRect(0,0,W,H)}
+  /* cámara que deriva lentamente */
+  const hero=view==='inicio'&&W>900; FX+= ((hero?.8:.62)-FX)*.04; FY+=((hero?.27:.52)-FY)*.04; FS+=((hero?6.4:5.2)-FS)*.04;
+  const scale=Math.min(W,H)/FS, ox=W*FX+Math.sin(T*.05)*W*.02, oy=H*FY+Math.cos(T*.04)*H*.02, rot=T*.01;
+  const P=([x,y])=>{const c=Math.cos(rot),s=Math.sin(rot);return[ox+(x*c-y*s)*scale,oy+(x*s+y*c)*scale]};
+  /* tatami */
+  cx.fillStyle=light?'#D9D4BD':'#1B2336';cx.fillRect(0,0,W,H);
+  cx.save();cx.translate(ox,oy);cx.rotate(rot);
+  const m=scale*.9, cols=Math.ceil(W/m)+6, rows=Math.ceil(H/(m*2))+6;
+  for(let i=-cols;i<cols;i++)for(let j=-rows;j<rows;j++){
+    const vertical=((i+j)%2===0), x=i*m, y=j*m*2+(i%2?m:0);
+    cx.fillStyle=light?((i+j)%3?'#E3DFC9':'#DDD8C0'):((i+j)%3?'#20293E':'#1D263A');
+    cx.fillRect(x+1,y+1,m-2,m*2-2);
+    cx.strokeStyle=light?'rgba(110,95,36,.18)':'rgba(201,183,122,.09)';cx.lineWidth=1;cx.strokeRect(x+.5,y+.5,m-1,m*2-1);
+    if(vertical){cx.strokeStyle=light?'rgba(110,95,36,.06)':'rgba(201,183,122,.035)';for(let s=6;s<m;s+=6){cx.beginPath();cx.moveTo(x+s,y+3);cx.lineTo(x+s,y+m*2-3);cx.stroke()}}
+  }
+  cx.restore();
+  /* estela: se desvanece como tinta */
+  tx.globalCompositeOperation='destination-out';tx.fillStyle=`rgba(0,0,0,${paused?0:.012})`;tx.fillRect(0,0,W,H);tx.globalCompositeOperation='source-over';
+  const s=pose(p,t),tp=P(s.T),up=P(s.U);
+  if(!paused&&t>.1&&t<.85){
+    tx.fillStyle=light?'rgba(30,39,64,.10)':'rgba(238,234,224,.10)';tx.beginPath();tx.arc(tp[0],tp[1],scale*.07,0,7);tx.fill();
+    tx.fillStyle=light?'rgba(110,95,36,.10)':'rgba(201,183,122,.10)';tx.beginPath();tx.arc(up[0],up[1],scale*.06,0,7);tx.fill();
+  }
+  cx.drawImage(trail,0,0,W,H);
+  /* ensō tenue que acompaña el ciclo */
+  cx.save();cx.strokeStyle=light?'rgba(30,39,64,.10)':'rgba(201,183,122,.12)';cx.lineWidth=scale*.05;cx.lineCap='round';
+  cx.beginPath();cx.arc(ox,oy,scale*1.75,-1.2,-1.2+Math.PI*1.85*ease(t));cx.stroke();cx.restore();
+  /* practicantes vistos desde arriba */
+  drawPerson(tp,s.Ta+rot,scale,true,light);
+  const ua=Math.atan2(tp[1]-up[1],tp[0]-up[0]);
+  drawPerson(up,ua,scale,false,light);
+  requestAnimationFrame(frame);
+}
+function drawPerson([x,y],a,sc,isTori,light){
+  cx.save();cx.translate(x,y);cx.rotate(a);
+  cx.shadowColor='rgba(0,0,0,.35)';cx.shadowBlur=sc*.08;cx.shadowOffsetY=sc*.02;
+  /* hombros (keikogi) */
+  cx.fillStyle=isTori?(light?'#F8F6EF':'#EEEAE0'):(light?'#F1ECDC':'#E4DDC8');
+  cx.beginPath();cx.ellipse(0,0,sc*.11,sc*.26,0,0,7);cx.fill();
+  cx.shadowBlur=0;
+  /* hakama visible como borde */
+  cx.strokeStyle=isTori?'#1E2740':'#6E5F24';cx.lineWidth=sc*.022;cx.stroke();
+  /* cabeza */
+  cx.fillStyle=light?'#3a3a3a':'#2b2622';cx.beginPath();cx.arc(sc*.02,0,sc*.075,0,7);cx.fill();
+  /* manos hacia el frente */
+  cx.fillStyle=isTori?(light?'#F8F6EF':'#EEEAE0'):(light?'#F1ECDC':'#E4DDC8');
+  cx.beginPath();cx.arc(sc*.2,sc*.14,sc*.035,0,7);cx.arc(sc*.2,-sc*.14,sc*.035,0,7);cx.fill();
+  cx.restore();
+}
+requestAnimationFrame(frame);
+$('#motionBtn').onclick=()=>{paused=!paused;$('#motionBtn').setAttribute('aria-pressed',paused);$('#motionBtn').textContent=paused?'▶ Reanudar el fondo':'⏸ Pausar el fondo';const v=$('#bgVideo');if(v.src){paused?v.pause():v.play().catch(()=>{})}};
+if(paused){$('#motionBtn').textContent='▶ Reanudar el fondo';$('#motionBtn').setAttribute('aria-pressed','true')}
+/* video propio de fondo: se reproduce solo en este navegador, no se sube a ningún lado */
+$('#vidBtn').onclick=()=>{const v=$('#bgVideo');if(v.src){v.pause();v.removeAttribute('src');v.load();v.style.display='none';cv.style.display='';$('#vidBtn').textContent='▶ Usar un video propio de fondo';return}$('#vidFile').click()};
+$('#vidFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const v=$('#bgVideo');v.src=URL.createObjectURL(f);v.style.display='block';cv.style.display='none';
+  v.play().then(()=>{$('#vidBtn').textContent='✕ Volver al tatami animado';$('#bgcap').innerHTML='Fondo: <b>tu video</b>, solo en este navegador'}).catch(()=>{v.style.display='none';cv.style.display='';$('#bgcap').textContent='Este navegador no pudo reproducir ese video. Prueba con un MP4.'});
+};
+
+/* ============ inicio ============ */
+renderHome();renderGlossCats();renderGloss();renderMap();renderDans();
+const h=location.hash.slice(1);
+if(h.startsWith('programa-')){gradeId=h.split('-')[1]||'5';go('programa')}else if(['programa','tecnicas','glosario','danes','practica'].includes(h))go(h);else go('inicio');
+</script>
+</body>
+</html>
